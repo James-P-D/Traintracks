@@ -20,12 +20,13 @@ grid = np.ndarray((CELL_COLS, CELL_ROWS), Cell)
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-message_label = Label(0, MESSAGE_STRIP_TOP, MESSAGE_RIBBON_WIDTH, MESSAGE_RIBBON_HEIGHT, "Test")
+message_label = Label(0, MESSAGE_STRIP_TOP, MESSAGE_RIBBON_WIDTH, MESSAGE_RIBBON_HEIGHT)
 
 clear_button = Button((BUTTON_WIDTH * 0), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, CLEAR_BUTTON_LABEL, True)
-play_button = Button((BUTTON_WIDTH * 1), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, PLAY_BUTTON_LABEL, False)
-solve_button = Button((BUTTON_WIDTH * 2), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, SOLVE_BUTTON_LABEL, False)
-quit_button = Button((BUTTON_WIDTH * 3), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, QUIT_BUTTON_LABEL, True)
+edit_button = Button((BUTTON_WIDTH * 1), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, EDIT_BUTTON_LABEL, False)
+play_button = Button((BUTTON_WIDTH * 2), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, PLAY_BUTTON_LABEL, False)
+solve_button = Button((BUTTON_WIDTH * 3), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, SOLVE_BUTTON_LABEL, False)
+quit_button = Button((BUTTON_WIDTH * 4), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, QUIT_BUTTON_LABEL, True)
 
 ###############################################
 # game_loop()
@@ -44,6 +45,9 @@ def game_loop():
                     if (clear_button.is_enabled()):
                         initialise();
                         draw_ui();                        
+                elif (edit_button.is_over(mouse_x, mouse_y)):
+                    if (edit_button.is_enabled()):
+                        pass
                 elif (play_button.is_over(mouse_x, mouse_y)):
                     if (play_button.is_enabled()):
                         pass
@@ -71,7 +75,7 @@ def game_loop():
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
                             grid[cell_col, cell_row].inc_state();
                             grid[cell_col, cell_row].draw(screen, False);
-                            terminals = get_terminals()
+                            check_board_state()
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -113,6 +117,19 @@ def get_terminals():
     print(f"terminals = {terminals}")
     return terminals
 
+###############################################
+# check_board_state()
+###############################################
+
+def check_board_state():
+    if len(get_terminals()) != 2:
+        message_label.set_label("You must specify 2 terminal points")
+        message_label.draw(screen)
+        return
+
+    message_label.set_label("")
+    message_label.draw(screen)
+        
 ###############################################
 # get_column_count()
 ###############################################
@@ -191,6 +208,7 @@ def draw_ui():
     screen.fill(BLACK)
 
     clear_button.draw(screen)
+    edit_button.draw(screen)
     play_button.draw(screen)
     solve_button.draw(screen)
     quit_button.draw(screen)
@@ -259,6 +277,7 @@ def set_default_game():
         for row in range(CELL_ROWS):            
             if(grid[col, row] == None):
                 grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
 ###############################################
 # main()
 ###############################################
@@ -269,6 +288,7 @@ def main():
     #initialise()
     set_default_game()
     draw_ui()
+    check_board_state()
 
     game_loop()
 

@@ -131,9 +131,9 @@ class Label():
     __y = 0
     __width = 0
     __height = 0
-    __label = "Test"
+    __label = ""
 
-    def __init__(self, x, y, width, height, label):
+    def __init__(self, x, y, width, height, label = ""):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
@@ -196,3 +196,9 @@ class Button():
         
     def is_enabled(self):
         return self.__enabled
+
+    def enable(self):
+        self.__enabled = True
+    
+    def disable(self):
+        self.__enabled = False
