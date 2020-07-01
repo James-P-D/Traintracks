@@ -50,6 +50,16 @@ BUTTON_DISABLED_COLOR = DARK_GRAY
 BUTTON_DISABLED_LABEL_COLOR = LIGHT_GRAY
 
 ###############################################
+# Label Details
+###############################################
+
+LABEL_BORDER_SIZE = 2
+
+LABEL_BORDER_COLOR = BLACK
+LABEL_COLOR = WHITE
+LABEL_FONT_COLOR = BLACK
+
+###############################################
 # Number Cells
 ###############################################
 
