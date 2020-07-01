@@ -35,6 +35,20 @@ def game_loop():
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()
                 cell_col = int(mouse_x / CELL_WIDTH)
                 cell_row = int(mouse_y / CELL_HEIGHT)
+                    
+                if ((cell_row == 0) and (cell_col != CELL_COLS)):
+                    top_number_strip[cell_col] = (top_number_strip[cell_col] + 1) % (CELL_COLS + 1)
+                    top_number_cells[cell_col].set_value(top_number_strip[cell_col])
+                    top_number_cells[cell_col].draw(screen)
+
+                elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
+                    cell_row -= 1
+                    right_number_strip[cell_row] =  (right_number_strip[cell_row] + 1) % (CELL_ROWS + 1)
+                    right_number_cells[cell_row].set_value(right_number_strip[cell_row])
+                    right_number_cells[cell_row].draw(screen)
+                else:
+                    cell_col = int(mouse_x / CELL_WIDTH) + 1
+                    cell_row = int(mouse_y / CELL_HEIGHT) + 1
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
