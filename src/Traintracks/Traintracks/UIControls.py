@@ -12,11 +12,12 @@ class NumberCell():
     __height = 0
     __value = 0
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, value = 0):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
+        self.__value = value
 
     def draw(self, screen):        
         pygame.draw.rect(screen, NUMBER_CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
@@ -49,11 +50,12 @@ class Cell():
     __height = 0
     __state = CELL_EMPTY
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, state = CELL_EMPTY):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
+        self.__state = state
 
     def draw(self, screen, is_correct):     
         

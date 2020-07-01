@@ -1,4 +1,8 @@
-#TODO: Need to actually check path
+#TODO:
+#
+# * Play/Edit mode
+# * Make cells fixed for playmode and disable NumberCell
+# * Need to actually check path in is_complete
 
 import pygame # Tested with pygame v1.9.6
 import numpy as np
@@ -211,15 +215,41 @@ def initialise():
     global right_number_strip    
     global grid
         
-    for col in range(CELL_COLS):
-        top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
-    
-    for row in range(CELL_ROWS):
-        right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
+    #for col in range(CELL_COLS):
+    #    top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
+   
+    #for row in range(CELL_ROWS):
+    #    right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
 
+    #for col in range(CELL_COLS):
+    #    for row in range(CELL_ROWS):            
+    #        grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
+    top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 5)
+    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 7)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    top_number_strip[3] = NumberCell(CELL_WIDTH * 3, 0, CELL_WIDTH, CELL_HEIGHT, 6)
+    top_number_strip[4] = NumberCell(CELL_WIDTH * 4, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[5] = NumberCell(CELL_WIDTH * 5, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    top_number_strip[6] = NumberCell(CELL_WIDTH * 6, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[7] = NumberCell(CELL_WIDTH * 7, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 4)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 6)
+    right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 5)
+    right_number_strip[3] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 3), CELL_WIDTH, CELL_HEIGHT, 5)
+    right_number_strip[4] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 4), CELL_WIDTH, CELL_HEIGHT, 3)
+    right_number_strip[5] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 5), CELL_WIDTH, CELL_HEIGHT, 4)
+    right_number_strip[6] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 6), CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[7] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 7), CELL_WIDTH, CELL_HEIGHT, 1)
+    grid[0, 0] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_RIGHT)
+    grid[1, 0] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
+    grid[0, 1] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_LEFT)
+    grid[0, 5] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (5 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_VERTICAL)
+    grid[1, 7] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (7 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_VERTICAL)
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):            
-            grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+            if(grid[col, row] == None):
+                grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
 
 ###############################################
 # main()
