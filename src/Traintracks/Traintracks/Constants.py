@@ -17,6 +17,8 @@ BUTTON_HEIGHT = 50
 
 WINDOW_HEIGHT = BUTTON_STRIP_TOP + BUTTON_HEIGHT
 
+FONT_SIZE = 18
+
 ###############################################
 # RGB Colors
 ###############################################
@@ -48,6 +50,7 @@ BUTTON_ENABLED_LABEL_COLOR = WHITE
 BUTTON_DISABLED_BORDER_COLOR = LIGHT_GRAY
 BUTTON_DISABLED_COLOR = DARK_GRAY
 BUTTON_DISABLED_LABEL_COLOR = LIGHT_GRAY
+BUTTON_FONT_SIZE = FONT_SIZE
 
 ###############################################
 # Label Details
@@ -58,6 +61,7 @@ LABEL_BORDER_SIZE = 1
 LABEL_BORDER_COLOR = BLACK
 LABEL_COLOR = WHITE
 LABEL_FONT_COLOR = BLACK
+LABEL_FONT_SIZE = FONT_SIZE
 
 ###############################################
 # Number Cells
@@ -68,6 +72,7 @@ NUMBER_CELL_BORDER_SIZE = 2
 NUMBER_CELL_BORDER_COLOR = LIGHT_GRAY
 NUMBER_CELL_COLOR = BLACK
 NUMBER_CELL_LABEL_COLOR = WHITE
+NUMBER_CELL_FONT_SIZE = FONT_SIZE
 
 ###############################################
 # Cell States
