@@ -7,11 +7,11 @@ from UIControls import *
 # Globals
 ###############################################
 
-grid = np.ndarray((CELL_COLS, CELL_ROWS), np.int8)
-top_number_strip = np.ndarray(CELL_COLS + 1, np.int8)
-right_number_strip = np.ndarray(CELL_ROWS + 1, np.int8)
+top_number_strip = np.ndarray(CELL_COLS, np.int8)
+right_number_strip = np.ndarray(CELL_ROWS, np.int8)
 top_number_cells = []
 right_number_cells = []
+grid = np.ndarray((CELL_COLS, CELL_ROWS), np.int8)
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -35,62 +35,47 @@ def game_loop():
                 game_exit = True;
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()
-                cell_col = int(mouse_x / CELL_WIDTH)
-                cell_row = int(mouse_y / CELL_HEIGHT)
-                    
-                if ((cell_row == 0) and (cell_col != CELL_COLS)):
-                    top_number_strip[cell_col] = (top_number_strip[cell_col] + 1) % (CELL_COLS + 1)
-                    top_number_cells[cell_col].set_value(top_number_strip[cell_col])
-                    top_number_cells[cell_col].draw(screen)
-
-                elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
-                    cell_row -= 1
-                    right_number_strip[cell_row] =  (right_number_strip[cell_row] + 1) % (CELL_ROWS + 1)
-                    right_number_cells[cell_row].set_value(right_number_strip[cell_row])
-                    right_number_cells[cell_row].draw(screen)
+                if (clear_button.is_over(mouse_x, mouse_y)):
+                    if (clear_button.is_enabled()):
+                        initialise();
+                        draw_ui();                        
+                elif (play_button.is_over(mouse_x, mouse_y)):
+                    if (play_button.is_enabled()):
+                        pass
+                elif (solve_button.is_over(mouse_x, mouse_y)):
+                    if (solve_button.is_enabled()):
+                        pass
+                elif (quit_button.is_over(mouse_x, mouse_y)):
+                    if (quit_button.is_enabled()):
+                        game_exit = True
                 else:
                     cell_col = int(mouse_x / CELL_WIDTH)
-                    cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
+                    cell_row = int(mouse_y / CELL_HEIGHT)
+                    
+                    if ((cell_row == 0) and (cell_col != CELL_COLS)):
+                        top_number_strip[cell_col] = (top_number_strip[cell_col] + 1) % (CELL_COLS + 1)
+                        top_number_cells[cell_col].set_value(top_number_strip[cell_col])
+                        top_number_cells[cell_col].draw(screen)
+                    elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
+                        cell_row -= 1
+                        right_number_strip[cell_row] =  (right_number_strip[cell_row] + 1) % (CELL_ROWS + 1)
+                        right_number_cells[cell_row].set_value(right_number_strip[cell_row])
+                        right_number_cells[cell_row].draw(screen)
+                    else:
+                        cell_col = int(mouse_x / CELL_WIDTH)
+                        cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
 
-                    if ((cell_col >=0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
-                        grid[cell_col, cell_row] = (grid[cell_col, cell_row] + 1) % TOTAL_CELL_STATES
-                        x = grid[cell_col, cell_row]
-                        
+                        if ((cell_col >=0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
+                            grid[cell_col, cell_row] = (grid[cell_col, cell_row] + 1) % TOTAL_CELL_STATES
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
-                if clear_button.is_over(mouse_x, mouse_y):
-                    initialise();
-                elif play_button.is_over(mouse_x, mouse_y):
-                    pass
-                elif solve_button.is_over(mouse_x, mouse_y):
-                    pass
-                elif quit_button.is_over(mouse_x, mouse_y):
-                    game_exit = True
+                
             
         #draw_grid()
         pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
-
-###############################################
-# initialise()
-###############################################
-def initialise():
-    global top_number_cells
-    global right_number_cells
-
-    for col in range(CELL_COLS):
-        top_number_strip[col] = 0
-        top_number_cells.append(NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT))
-    
-    for row in range(CELL_ROWS):
-        right_number_strip[row] = 0
-        right_number_cells.append(NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT))
-
-    for col in range(CELL_COLS):
-        for row in range(CELL_ROWS):
-            grid[col, row] = CELL_EMPTY            
 
 ###############################################
 # draw_cell()
@@ -100,9 +85,9 @@ def draw_cell(col, row):
     pygame.draw.rect(screen, CELL_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH - (CELL_BORDER_SIZE * 2), CELL_HEIGHT - (CELL_BORDER_SIZE * 2)), 0)        
 
 ###############################################
-# initialise()
+# draw_ui()
 ###############################################
-def create_ui():
+def draw_ui():
     screen.fill(BLACK)
 
     clear_button.draw(screen)
@@ -123,6 +108,30 @@ def create_ui():
             draw_cell(col, row);            
 
 ###############################################
+# initialise()
+###############################################
+def initialise():
+    global top_number_cells
+    global right_number_cells
+    global top_number_strip
+    global right_number_strip    
+
+    top_number_cells.clear();
+    right_number_cells.clear();
+
+    for col in range(CELL_COLS):
+        top_number_strip[col] = 0
+        top_number_cells.append(NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT))
+    
+    for row in range(CELL_ROWS):
+        right_number_strip[row] = 0
+        right_number_cells.append(NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT))
+
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            grid[col, row] = CELL_EMPTY         
+
+###############################################
 # main()
 ###############################################
 
@@ -130,7 +139,7 @@ def main():
     pygame.init()
     
     initialise()
-    create_ui()
+    draw_ui()
 
     game_loop()
 
