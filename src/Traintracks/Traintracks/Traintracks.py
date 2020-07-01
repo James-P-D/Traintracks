@@ -1,3 +1,5 @@
+#TODO: Need to actually check path
+
 import pygame # Tested with pygame v1.9.6
 import numpy as np
 from Constants import *
@@ -7,10 +9,8 @@ from UIControls import *
 # Globals
 ###############################################
 
-top_number_strip = np.ndarray(CELL_COLS, np.int8)
-right_number_strip = np.ndarray(CELL_ROWS, np.int8)
-top_number_cells = []
-right_number_cells = []
+top_number_strip = np.ndarray(CELL_COLS, NumberCell)
+right_number_strip = np.ndarray(CELL_ROWS, NumberCell)
 
 grid = np.ndarray((CELL_COLS, CELL_ROWS), Cell)
 
@@ -54,14 +54,12 @@ def game_loop():
                     cell_row = int(mouse_y / CELL_HEIGHT)
                     
                     if ((cell_row == 0) and (cell_col != CELL_COLS)):
-                        top_number_strip[cell_col] = (top_number_strip[cell_col] + 1) % (CELL_COLS + 1)
-                        top_number_cells[cell_col].set_value(top_number_strip[cell_col])
-                        top_number_cells[cell_col].draw(screen)
+                        top_number_strip[cell_col].inc_value(CELL_ROWS)
+                        top_number_strip[cell_col].draw(screen)
                     elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
                         cell_row -= 1
-                        right_number_strip[cell_row] =  (right_number_strip[cell_row] + 1) % (CELL_ROWS + 1)
-                        right_number_cells[cell_row].set_value(right_number_strip[cell_row])
-                        right_number_cells[cell_row].draw(screen)
+                        right_number_strip[cell_row].inc_value(CELL_ROWS)
+                        right_number_strip[cell_row].draw(screen)
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
@@ -69,7 +67,7 @@ def game_loop():
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
                             grid[cell_col, cell_row].inc_state();
                             grid[cell_col, cell_row].draw(screen, False);
-                            terminals = count_terminals()
+                            terminals = get_terminals()
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -80,36 +78,83 @@ def game_loop():
     pygame.quit()
 
 ###############################################
-# count_terminals()
+# get_terminals()
 ###############################################
-def count_terminals():
-    terminals = 0
+def get_terminals():
+    terminals = []
     for col in range(1, CELL_COLS - 1):
         if (grid[col, 0].get_state() in [CELL_VERTICAL, CELL_TOP_LEFT, CELL_TOP_RIGHT]):
-            terminals += 1
+            terminals.append((col, 0))
         if (grid[col, CELL_ROWS - 1].get_state() in [CELL_VERTICAL, CELL_BOTTOM_LEFT, CELL_BOTTOM_RIGHT]):
-            terminals += 1
+            terminals.append((col, CELL_ROWS - 1))
 
     for row in range(1, CELL_ROWS - 1):
         if (grid[0, row].get_state() in [CELL_HORIZONTAL, CELL_TOP_LEFT, CELL_BOTTOM_LEFT]):
-            terminals += 1
+            terminals.append((0, row))
         if (grid[CELL_COLS - 1, row].get_state() in [CELL_HORIZONTAL, CELL_TOP_RIGHT, CELL_BOTTOM_RIGHT]):
-            terminals += 1
+            terminals.append((CELL_COLS - 1, row))
     
     if (grid[0, 0].get_state() not in [CELL_TOP_LEFT, CELL_BOTTOM_RIGHT, CELL_EMPTY]):
-        terminals += 1
+        terminals.append((0, 0))
 
     if (grid[CELL_COLS - 1, 0].get_state() not in [CELL_TOP_RIGHT, CELL_BOTTOM_LEFT, CELL_EMPTY]):
-        terminals += 1
+        terminals.append((CELL_COLS - 1, 0))
 
     if (grid[0, CELL_ROWS - 1].get_state() not in [CELL_BOTTOM_LEFT, CELL_TOP_RIGHT, CELL_EMPTY]):
-        terminals += 1
+        terminals.append((0, CELL_ROWS - 1))
 
     if (grid[CELL_COLS - 1, CELL_ROWS - 1].get_state() not in [CELL_BOTTOM_RIGHT, CELL_TOP_LEFT, CELL_EMPTY]):
-        terminals += 1
+        terminals.append((CELL_COLS - 1, CELL_ROWS - 1))
 
     print(f"terminals = {terminals}")
     return terminals
+
+###############################################
+# get_column_count()
+###############################################
+
+def get_column_count(col):
+    col_count = 0
+    for row in range(CELL_ROWS):
+        if (grid[col, row].get_state() != CELL_EMPTY):
+            col_count += 1
+    return col_count
+
+###############################################
+# get_row_count()
+###############################################
+
+def get_row_count(col):
+    row_count = 0
+    for col in range(CELL_COLS):
+        if (grid[col, row].get_state() != CELL_EMPTY):
+            row_count += 1
+    return row_count
+
+###############################################
+# is_complete()
+###############################################
+def is_complete():
+    terminals = get_terminals()
+    if len(get_terminals()) != 2:
+        return False
+
+    first_terminal = terminals[0]
+    second_terminal = terminals[1]
+
+    for col in range(CELL_COLS):
+        col_count = get_column_count(col)
+        if (col_count != top_number_strip[col].get_value()):
+            return False
+    
+    for row in range(CELL_ROWS):
+        row_count = get_row_count(row)
+        if (row_count != right_number_strip[row].get_value()):
+            return False
+
+    #TODO: Need to check that path is actually correct here also!
+
+    return Treu;
 
 ###############################################
 # draw_cell()
@@ -149,10 +194,10 @@ def draw_ui():
     message_label.draw(screen)
 
     for col in range(CELL_COLS):
-        top_number_cells[col].draw(screen)
+        top_number_strip[col].draw(screen)
 
     for row in range(CELL_ROWS):
-        right_number_cells[row].draw(screen)
+        right_number_strip[row].draw(screen)
 
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
@@ -162,22 +207,15 @@ def draw_ui():
 # initialise()
 ###############################################
 def initialise():
-    global top_number_cells
-    global right_number_cells
     global top_number_strip
     global right_number_strip    
     global grid
-
-    top_number_cells.clear();
-    right_number_cells.clear();    
-
+        
     for col in range(CELL_COLS):
-        top_number_strip[col] = 0
-        top_number_cells.append(NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT))
+        top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
     
     for row in range(CELL_ROWS):
-        right_number_strip[row] = 0
-        right_number_cells.append(NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT))
+        right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
 
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):            

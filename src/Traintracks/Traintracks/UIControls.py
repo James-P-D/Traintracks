@@ -32,8 +32,11 @@ class NumberCell():
     def is_over(self, mouse_x, mouse_y):
         return ((mouse_x >= self.__x) and (mouse_x < (self.__x + self.__width)) and (mouse_y >= self.__y) and (mouse_y < (self.__y + self.__height)))
         
-    def set_value(self, value):
-        self.__value = value;    
+    def inc_value(self, cap):
+        self.__value = (self.__value + 1) % cap
+
+    def get_value(self, value):
+        return self.__value;
 
 ###############################################
 # Cell()
