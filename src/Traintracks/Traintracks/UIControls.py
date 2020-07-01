@@ -10,7 +10,7 @@ class NumberCell():
     __y = 0
     __width = 0
     __height = 0
-    __value = CELL_EMPTY
+    __value = 0
 
     def __init__(self, x, y, width, height):
         self.__x = int(x)
@@ -20,7 +20,7 @@ class NumberCell():
 
     def draw(self, screen):        
         pygame.draw.rect(screen, NUMBER_CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
-        pygame.draw.rect(screen, NUMBER_CELL_COLOR, (self.__x + BUTTON_BORDER_SIZE, self.__y + BUTTON_BORDER_SIZE, self.__width - (BUTTON_BORDER_SIZE * 2), self.__height - (BUTTON_BORDER_SIZE * 2)), 0)
+        pygame.draw.rect(screen, NUMBER_CELL_COLOR, (self.__x + NUMBER_CELL_BORDER_SIZE, self.__y + NUMBER_CELL_BORDER_SIZE, self.__width - (NUMBER_CELL_BORDER_SIZE * 2), self.__height - (NUMBER_CELL_BORDER_SIZE * 2)), 0)
 
         if (self.__value != -1):
             label_font = pygame.font.SysFont('courier', 14)
@@ -45,34 +45,74 @@ class Cell():
     __width = 0
     __height = 0
     __state = CELL_EMPTY
-    __fixed = False
 
-    def __init__(self, x, y, width, height, state, fixed):
+    def __init__(self, x, y, width, height):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
-        self.__state = state
-        self.__fixed = fixed
 
-    def draw(self, screen):        
-        pygame.draw.rect(screen, CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
-        pygame.draw.rect(screen, CELL_COLOR, (self.__x + BUTTON_BORDER_SIZE, self.__y + BUTTON_BORDER_SIZE, self.__width - (BUTTON_BORDER_SIZE * 2), self.__height - (BUTTON_BORDER_SIZE * 2)), 0)
-
-        label_font = pygame.font.SysFont('courier', 14)
-        label_text = label_font.render(self.__label, 1, CELL_FONT_COLOR)
-        label_x = ((self.__width / 2) - (label_text.get_width() / 2) + self.__x)
-        label_y = ((self.__height / 2) - (label_text.get_height() / 2) + self.__y)
-        screen.blit(label_text, (int(label_x), int(label_y)))
-
-    def is_over(self, mouse_x, mouse_y):
-        return ((mouse_x >= self.__x) and (mouse_x < (self.__x + self.__width)) and (mouse_y >= self.__y) and (mouse_y < (self.__y + self.__height)))
+    def draw(self, screen, is_correct):     
         
-    def is_fixed(self):
-        return self.__fixed
+        def draw_left_line(cell_track_color):
+            x1 = self.__x + CELL_BORDER_SIZE
+            y1 = self.__y + (CELL_HEIGHT / 2)
+            x2 = x1 + ((CELL_WIDTH - (2 * CELL_BORDER_SIZE)) / 2)
+            y2 = y1
+            pygame.draw.line(screen, cell_track_color, (x1, y1), (x2, y2), CELL_TRACK_SIZE)
 
-    def get_state(self):
-        return self.__state
+        def draw_right_line(cell_track_color):
+            x1 = self.__x + CELL_BORDER_SIZE + ((CELL_WIDTH - (2 * CELL_BORDER_SIZE)) / 2)
+            y1 = self.__y + (CELL_HEIGHT / 2)
+            x2 = x1 + ((CELL_WIDTH - (2 * CELL_BORDER_SIZE)) / 2)
+            y2 = self.__y + (CELL_HEIGHT / 2)
+            pygame.draw.line(screen, cell_track_color, (x1, y1), (x2, y2), CELL_TRACK_SIZE)
+
+        def draw_top_line(cell_track_color):
+            x1 = self.__x + CELL_BORDER_SIZE + ((CELL_WIDTH - (2 * CELL_BORDER_SIZE)) / 2)
+            y1 = self.__y + CELL_BORDER_SIZE
+            x2 = x1
+            y2 = self.__y + (CELL_HEIGHT / 2)
+            pygame.draw.line(screen, cell_track_color, (x1, y1), (x2, y2), CELL_TRACK_SIZE)
+
+        def draw_bottom_line(cell_track_color):
+            x1 = self.__x + CELL_BORDER_SIZE + ((CELL_WIDTH - (2 * CELL_BORDER_SIZE)) / 2)
+            y1 = self.__y + (CELL_HEIGHT / 2)
+            x2 = x1
+            y2 = y1 + ((CELL_HEIGHT - (2 * CELL_BORDER_SIZE)) / 2)
+            pygame.draw.line(screen, cell_track_color, (x1, y1), (x2, y2), CELL_TRACK_SIZE)
+
+
+        pygame.draw.rect(screen, CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
+        pygame.draw.rect(screen, CELL_COLOR, (self.__x + CELL_BORDER_SIZE, self.__y + CELL_BORDER_SIZE, self.__width - (CELL_BORDER_SIZE * 2), self.__height - (CELL_BORDER_SIZE * 2)), 0)
+        cell_track_color = CELL_TRACK_GOOD_COLOR if is_correct else CELL_TRACK_BAD_COLOR
+    
+        if (self.__state == CELL_HORIZONTAL):
+            draw_left_line(cell_track_color)  
+            draw_right_line(cell_track_color)  
+        elif (self.__state == CELL_VERTICAL):
+            draw_top_line(cell_track_color)
+            draw_bottom_line(cell_track_color)
+            pass
+        elif (self.__state == CELL_TOP_LEFT):
+            draw_left_line(cell_track_color)  
+            draw_top_line(cell_track_color)
+            pass
+        elif (self.__state == CELL_TOP_RIGHT):
+            draw_top_line(cell_track_color)
+            draw_right_line(cell_track_color)  
+            pass
+        elif (self.__state == CELL_BOTTOM_RIGHT):
+            draw_right_line(cell_track_color)  
+            draw_bottom_line(cell_track_color)
+            pass
+        elif (self.__state == CELL_BOTTOM_LEFT):
+            draw_bottom_line(cell_track_color)
+            draw_left_line(cell_track_color)  
+            pass
+        
+    def inc_state(self):
+        self.__state = (self.__state + 1) % TOTAL_CELL_STATES;    
 
 ###############################################
 # Label()

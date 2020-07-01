@@ -11,7 +11,8 @@ top_number_strip = np.ndarray(CELL_COLS, np.int8)
 right_number_strip = np.ndarray(CELL_ROWS, np.int8)
 top_number_cells = []
 right_number_cells = []
-grid = np.ndarray((CELL_COLS, CELL_ROWS), np.int8)
+
+grid = np.ndarray((CELL_COLS, CELL_ROWS), Cell)
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -64,13 +65,13 @@ def game_loop():
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
-
-                        if ((cell_col >=0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
-                            grid[cell_col, cell_row] = (grid[cell_col, cell_row] + 1) % TOTAL_CELL_STATES
+                        print(f"({cell_col}, {cell_row})")
+                        if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
+                            grid[cell_col, cell_row].inc_state();
+                            grid[cell_col, cell_row].draw(screen, False);                            
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
-                
             
         #draw_grid()
         pygame.display.update()
@@ -80,9 +81,26 @@ def game_loop():
 ###############################################
 # draw_cell()
 ###############################################
-def draw_cell(col, row):
+def draw_cell(col, row, value, is_correct):        
     pygame.draw.rect(screen, CELL_BORDER_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT), 0)        
     pygame.draw.rect(screen, CELL_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH - (CELL_BORDER_SIZE * 2), CELL_HEIGHT - (CELL_BORDER_SIZE * 2)), 0)        
+    
+    cell_track_color = CELL_TRACK_GOOD_COLOR if is_correct else CELL_TRACK_BAD_COLOR
+    
+    if (value == CELL_HORIZONTAL):
+        draw_left_line(col, row, cell_track_color)
+        pass
+    elif (value == CELL_VERTICAL):
+        pass
+    elif (value == CELL_TOP_LEFT):
+        pass
+    elif (value == CELL_TOP_RIGHT):
+        pass
+    elif (value == CELL_BOTTOM_RIGHT):
+        pass
+    elif (value == CELL_BOTTOM_LEFT):
+        pass
+        
 
 ###############################################
 # draw_ui()
@@ -105,7 +123,7 @@ def draw_ui():
 
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
-            draw_cell(col, row);            
+            grid[col, row].draw(screen, False);
 
 ###############################################
 # initialise()
@@ -115,9 +133,10 @@ def initialise():
     global right_number_cells
     global top_number_strip
     global right_number_strip    
+    global grid
 
     top_number_cells.clear();
-    right_number_cells.clear();
+    right_number_cells.clear();    
 
     for col in range(CELL_COLS):
         top_number_strip[col] = 0
@@ -128,8 +147,8 @@ def initialise():
         right_number_cells.append(NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT))
 
     for col in range(CELL_COLS):
-        for row in range(CELL_ROWS):
-            grid[col, row] = CELL_EMPTY         
+        for row in range(CELL_ROWS):            
+            grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
 
 ###############################################
 # main()
