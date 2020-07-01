@@ -112,7 +112,10 @@ class Cell():
             pass
         
     def inc_state(self):
-        self.__state = (self.__state + 1) % TOTAL_CELL_STATES;    
+        self.__state = (self.__state + 1) % TOTAL_CELL_STATES
+
+    def get_state(self):
+        return self.__state
 
 ###############################################
 # Label()

@@ -68,7 +68,8 @@ def game_loop():
                         print(f"({cell_col}, {cell_row})")
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
                             grid[cell_col, cell_row].inc_state();
-                            grid[cell_col, cell_row].draw(screen, False);                            
+                            grid[cell_col, cell_row].draw(screen, False);
+                            terminals = count_terminals()
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -77,6 +78,38 @@ def game_loop():
         pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
+
+###############################################
+# count_terminals()
+###############################################
+def count_terminals():
+    terminals = 0
+    for col in range(1, CELL_COLS - 1):
+        if (grid[col, 0].get_state() in [CELL_VERTICAL, CELL_TOP_LEFT, CELL_TOP_RIGHT]):
+            terminals += 1
+        if (grid[col, CELL_ROWS - 1].get_state() in [CELL_VERTICAL, CELL_BOTTOM_LEFT, CELL_BOTTOM_RIGHT]):
+            terminals += 1
+
+    for row in range(1, CELL_ROWS - 1):
+        if (grid[0, row].get_state() in [CELL_HORIZONTAL, CELL_TOP_LEFT, CELL_BOTTOM_LEFT]):
+            terminals += 1
+        if (grid[CELL_COLS - 1, row].get_state() in [CELL_HORIZONTAL, CELL_TOP_RIGHT, CELL_BOTTOM_RIGHT]):
+            terminals += 1
+    
+    if (grid[0, 0].get_state() not in [CELL_TOP_LEFT, CELL_BOTTOM_RIGHT, CELL_EMPTY]):
+        terminals += 1
+
+    if (grid[CELL_COLS - 1, 0].get_state() not in [CELL_TOP_RIGHT, CELL_BOTTOM_LEFT, CELL_EMPTY]):
+        terminals += 1
+
+    if (grid[0, CELL_ROWS - 1].get_state() not in [CELL_BOTTOM_LEFT, CELL_TOP_RIGHT, CELL_EMPTY]):
+        terminals += 1
+
+    if (grid[CELL_COLS - 1, CELL_ROWS - 1].get_state() not in [CELL_BOTTOM_RIGHT, CELL_TOP_LEFT, CELL_EMPTY]):
+        terminals += 1
+
+    print(f"terminals = {terminals}")
+    return terminals
 
 ###############################################
 # draw_cell()
