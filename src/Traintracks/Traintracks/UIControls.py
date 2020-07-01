@@ -24,7 +24,7 @@ class NumberCell():
         pygame.draw.rect(screen, NUMBER_CELL_COLOR, (self.__x + NUMBER_CELL_BORDER_SIZE, self.__y + NUMBER_CELL_BORDER_SIZE, self.__width - (NUMBER_CELL_BORDER_SIZE * 2), self.__height - (NUMBER_CELL_BORDER_SIZE * 2)), 0)
 
         if (self.__value != -1):
-            label_font = pygame.font.SysFont('courier', NUMBER_CELL_FONT_SIZE)
+            label_font = pygame.font.SysFont('courier', NUMBER_CELL_FONT_SIZE, bold = True)
             label_text = label_font.render(str(self.__value), 1, NUMBER_CELL_LABEL_COLOR)
             label_x = ((self.__width / 2) - (label_text.get_width() / 2) + self.__x)
             label_y = ((self.__height / 2) - (label_text.get_height() / 2) + self.__y)
@@ -131,7 +131,7 @@ class Label():
     __y = 0
     __width = 0
     __height = 0
-    __label = ""
+    __label = "Test"
 
     def __init__(self, x, y, width, height, label):
         self.__x = int(x)
@@ -144,7 +144,7 @@ class Label():
         pygame.draw.rect(screen, LABEL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
         pygame.draw.rect(screen, LABEL_COLOR, (self.__x + LABEL_BORDER_SIZE, self.__y + LABEL_BORDER_SIZE, self.__width - (LABEL_BORDER_SIZE * 2), self.__height - (BUTTON_BORDER_SIZE * 2)), 0)
 
-        label_font = pygame.font.SysFont('courier', LABEL_FONT_SIZE)
+        label_font = pygame.font.SysFont('courier', LABEL_FONT_SIZE, bold = True)
         label_text = label_font.render(self.__label, 1, LABEL_FONT_COLOR)
         label_x = ((self.__width / 2) - (label_text.get_width() / 2) + self.__x)
         label_y = ((self.__height / 2) - (label_text.get_height() / 2) + self.__y)
@@ -185,7 +185,7 @@ class Button():
         pygame.draw.rect(screen, button_border_color, (self.__x, self.__y, self.__width, self.__height), 0)        
         pygame.draw.rect(screen, button_color, (self.__x + BUTTON_BORDER_SIZE, self.__y + BUTTON_BORDER_SIZE, self.__width - (BUTTON_BORDER_SIZE * 2), self.__height - (BUTTON_BORDER_SIZE * 2)), 0)
 
-        label_font = pygame.font.SysFont('courier', BUTTON_FONT_SIZE)
+        label_font = pygame.font.SysFont('courier', BUTTON_FONT_SIZE, bold = True)
         label_text = label_font.render(self.__label, 1, button_font_color)
         label_x = ((self.__width / 2) - (label_text.get_width() / 2) + self.__x)
         label_y = ((self.__height / 2) - (label_text.get_height() / 2) + self.__y)

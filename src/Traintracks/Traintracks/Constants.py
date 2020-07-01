@@ -17,7 +17,7 @@ BUTTON_HEIGHT = 50
 
 WINDOW_HEIGHT = BUTTON_STRIP_TOP + BUTTON_HEIGHT
 
-FONT_SIZE = 18
+FONT_SIZE = 20
 
 ###############################################
 # RGB Colors
