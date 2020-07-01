@@ -215,15 +215,24 @@ def initialise():
     global right_number_strip    
     global grid
         
-    #for col in range(CELL_COLS):
-    #    top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
+    for col in range(CELL_COLS):
+        top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
    
-    #for row in range(CELL_ROWS):
-    #    right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
+    for row in range(CELL_ROWS):
+        right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
 
-    #for col in range(CELL_COLS):
-    #    for row in range(CELL_ROWS):            
-    #        grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):            
+            grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
+###############################################
+# set_default_game()
+###############################################
+
+def set_default_game():
+    global top_number_strip
+    global right_number_strip    
+    global grid
 
     top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 5)
     top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 7)
@@ -250,7 +259,6 @@ def initialise():
         for row in range(CELL_ROWS):            
             if(grid[col, row] == None):
                 grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
-
 ###############################################
 # main()
 ###############################################
@@ -258,7 +266,8 @@ def initialise():
 def main():
     pygame.init()
     
-    initialise()
+    #initialise()
+    set_default_game()
     draw_ui()
 
     game_loop()
