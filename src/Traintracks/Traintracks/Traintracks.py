@@ -43,17 +43,16 @@ def game_loop():
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()
                 if (clear_button.is_over(mouse_x, mouse_y)):
                     if (clear_button.is_enabled()):
-                        initialise();
-                        draw_ui();                        
+                        clear_button_pressed()
                 elif (edit_button.is_over(mouse_x, mouse_y)):
                     if (edit_button.is_enabled()):
-                        pass
+                        edit_button_pressed()
                 elif (play_button.is_over(mouse_x, mouse_y)):
                     if (play_button.is_enabled()):
-                        pass
+                        play_button_pressed()
                 elif (solve_button.is_over(mouse_x, mouse_y)):
                     if (solve_button.is_enabled()):
-                        pass
+                        solve_button_pressed()
                 elif (quit_button.is_over(mouse_x, mouse_y)):
                     if (quit_button.is_enabled()):
                         game_exit = True
@@ -84,6 +83,36 @@ def game_loop():
         pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
+
+###############################################
+# clear_button_pressed()
+###############################################
+def clear_button_pressed():
+    initialise();
+    draw_ui();                        
+
+###############################################
+# edit_button_pressed()
+###############################################
+def edit_button_pressed():
+    clear_button.enable()
+    clear_button.draw(screen)
+    
+###############################################
+# play_button_pressed()
+###############################################
+def play_button_pressed():
+    clear_button.disable()
+    clear_button.draw(screen)
+    edit_button.enable()
+    edit_button.draw(screen)
+    Need to do more here to enable and siable buttons !
+    
+###############################################
+# save_button_pressed()
+###############################################
+def save_button_pressed():
+    pass
 
 ###############################################
 # get_terminals()
@@ -125,8 +154,16 @@ def check_board_state():
     if len(get_terminals()) != 2:
         message_label.set_label("You must specify 2 terminal points")
         message_label.draw(screen)
+        play_button.disable()
+        play_button.draw(screen)
+        solve_button.disable()
+        solve_button.draw(screen)    
         return
 
+    play_button.enable()
+    play_button.draw(screen)
+    solve_button.enable()
+    solve_button.draw(screen)
     message_label.set_label("")
     message_label.draw(screen)
         
@@ -224,6 +261,7 @@ def draw_ui():
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
             grid[col, row].draw(screen, False);
+    check_board_state()
 
 ###############################################
 # initialise()
@@ -288,7 +326,6 @@ def main():
     #initialise()
     set_default_game()
     draw_ui()
-    check_board_state()
 
     game_loop()
 
