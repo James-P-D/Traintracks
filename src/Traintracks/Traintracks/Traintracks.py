@@ -49,8 +49,13 @@ def game_loop():
                     right_number_cells[cell_row].set_value(right_number_strip[cell_row])
                     right_number_cells[cell_row].draw(screen)
                 else:
-                    cell_col = int(mouse_x / CELL_WIDTH) + 1
-                    cell_row = int(mouse_y / CELL_HEIGHT) + 1
+                    cell_col = int(mouse_x / CELL_WIDTH)
+                    cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
+
+                    if ((cell_col >=0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
+                        grid[cell_col, cell_row] = (grid[cell_col, cell_row] + 1) % TOTAL_CELL_STATES
+                        x = grid[cell_col, cell_row]
+                        
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -88,6 +93,13 @@ def initialise():
             grid[col, row] = CELL_EMPTY            
 
 ###############################################
+# draw_cell()
+###############################################
+def draw_cell(col, row):
+    pygame.draw.rect(screen, CELL_BORDER_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT), 0)        
+    pygame.draw.rect(screen, CELL_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH - (CELL_BORDER_SIZE * 2), CELL_HEIGHT - (CELL_BORDER_SIZE * 2)), 0)        
+
+###############################################
 # initialise()
 ###############################################
 def create_ui():
@@ -106,7 +118,9 @@ def create_ui():
     for row in range(CELL_ROWS):
         right_number_cells[row].draw(screen)
 
-    #draw_grid()
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            draw_cell(col, row);            
 
 ###############################################
 # main()

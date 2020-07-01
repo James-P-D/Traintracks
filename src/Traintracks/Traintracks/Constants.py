@@ -53,7 +53,7 @@ BUTTON_DISABLED_LABEL_COLOR = LIGHT_GRAY
 # Label Details
 ###############################################
 
-LABEL_BORDER_SIZE = 2
+LABEL_BORDER_SIZE = 1
 
 LABEL_BORDER_COLOR = BLACK
 LABEL_COLOR = WHITE
@@ -71,6 +71,10 @@ NUMBER_CELL_LABEL_COLOR = WHITE
 # Cell States
 ###############################################
 
+CELL_BORDER_SIZE = 2
+CELL_BORDER_COLOR = LIGHT_GRAY
+CELL_COLOR = WHITE
+
 CELL_EMPTY = 0
 CELL_HORIZONTAL = 1
 CELL_VERTICAL = 2
@@ -78,6 +82,7 @@ CELL_TOP_LEFT = 3
 CELL_TOP_RIGHT = 4
 CELL_BOTTOM_RIGHT = 5
 CELL_BOTTOM_LEFT = 6
+TOTAL_CELL_STATES = 7
 
 ###############################################
 # PyGame
