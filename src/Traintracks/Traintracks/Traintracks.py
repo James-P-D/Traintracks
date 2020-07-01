@@ -8,6 +8,11 @@ from UIControls import *
 ###############################################
 
 grid = np.ndarray((CELL_COLS, CELL_ROWS), np.int8)
+top_number_strip = np.ndarray(CELL_COLS + 1, np.int8)
+right_number_strip = np.ndarray(CELL_ROWS + 1, np.int8)
+top_number_cells = []
+right_number_cells = []
+
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 clear_button = Button((BUTTON_WIDTH * 0), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, CLEAR_BUTTON_LABEL, True)
@@ -26,17 +31,42 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_exit = True;
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                (mouse_x, mouse_y) = pygame.mouse.get_pos()
+                cell_col = int(mouse_x / CELL_WIDTH)
+                cell_row = int(mouse_y / CELL_HEIGHT)
+                
+            elif event.type == pygame.MOUSEBUTTONUP:
+                (mouse_x, mouse_y) = pygame.mouse.get_pos()                
+                if clear_button.is_over(mouse_x, mouse_y):
+                    initialise();
+                elif play_button.is_over(mouse_x, mouse_y):
+                    pass
+                elif solve_button.is_over(mouse_x, mouse_y):
+                    pass
+                elif quit_button.is_over(mouse_x, mouse_y):
+                    game_exit = True
+            
         #draw_grid()
-        #pygame.display.update()
+        pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
-
 
 ###############################################
 # initialise()
 ###############################################
 def initialise():
-    # Set all cells to EMPTY by default
+    global top_number_cells
+    global right_number_cells
+
+    for col in range(CELL_COLS):
+        top_number_strip[col] = 0
+        top_number_cells.append(NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT))
+    
+    for row in range(CELL_ROWS):
+        right_number_strip[row] = 0
+        right_number_cells.append(NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT))
+
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
             grid[col, row] = CELL_EMPTY            
@@ -52,6 +82,12 @@ def create_ui():
     solve_button.draw(screen)
     quit_button.draw(screen)
     
+    for col in range(CELL_COLS):
+        top_number_cells[col].draw(screen)
+
+    for row in range(CELL_ROWS):
+        right_number_cells[row].draw(screen)
+
     #draw_grid()
 
 ###############################################
