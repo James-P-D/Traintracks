@@ -28,6 +28,8 @@ play_button = Button((BUTTON_WIDTH * 2), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_
 solve_button = Button((BUTTON_WIDTH * 3), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, SOLVE_BUTTON_LABEL, False)
 quit_button = Button((BUTTON_WIDTH * 4), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, QUIT_BUTTON_LABEL, True)
 
+edit_mode = True
+
 ###############################################
 # game_loop()
 ###############################################
@@ -61,20 +63,23 @@ def game_loop():
                     cell_row = int(mouse_y / CELL_HEIGHT)
                     
                     if ((cell_row == 0) and (cell_col != CELL_COLS)):
-                        top_number_strip[cell_col].inc_value(CELL_ROWS)
-                        top_number_strip[cell_col].draw(screen)
+                        if (top_number_strip[cell_col].is_enabled()):
+                            top_number_strip[cell_col].inc_value(CELL_ROWS)
+                            top_number_strip[cell_col].draw(screen)
                     elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
-                        cell_row -= 1
-                        right_number_strip[cell_row].inc_value(CELL_ROWS)
-                        right_number_strip[cell_row].draw(screen)
+                            cell_row -= 1
+                            if (right_number_strip[cell_row].is_enabled()):
+                                right_number_strip[cell_row].inc_value(CELL_ROWS)
+                                right_number_strip[cell_row].draw(screen)
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
                         print(f"({cell_col}, {cell_row})")
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
-                            grid[cell_col, cell_row].inc_state();
-                            grid[cell_col, cell_row].draw(screen, False);
-                            check_board_state()
+                            if (grid[cell_col, cell_row].is_enabled()):
+                                grid[cell_col, cell_row].inc_state();
+                                grid[cell_col, cell_row].draw(screen, False);
+                                check_board_state()
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -88,30 +93,57 @@ def game_loop():
 # clear_button_pressed()
 ###############################################
 def clear_button_pressed():
-    initialise();
+    if (edit_mode):
+        initialise();
+    else:
+        for col in range(CELL_COLS):
+            for row in range(CELL_ROWS):
+                if (grid[col, row].is_enabled()):
+                    grid[col, row].set_state(CELL_EMPTY)
+
     draw_ui();                        
 
 ###############################################
 # edit_button_pressed()
 ###############################################
 def edit_button_pressed():
-    clear_button.enable()
-    clear_button.draw(screen)
+    play_button.disable()
+    play_button.draw(screen)
+
+    for col in range(CELL_COLS):
+        top_number_strip[col].enable()
+    for row in range(CELL_ROWS):
+        right_number_strip[row].enable()    
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            grid[col, row].enable();
+
+    global edit_mode
+    edit_mode = True
     
 ###############################################
 # play_button_pressed()
 ###############################################
 def play_button_pressed():
-    clear_button.disable()
-    clear_button.draw(screen)
     edit_button.enable()
     edit_button.draw(screen)
-    Need to do more here to enable and siable buttons !
-    
+
+    for col in range(CELL_COLS):
+        top_number_strip[col].disable()
+    for row in range(CELL_ROWS):
+        right_number_strip[row].disable()    
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            if (grid[col, row].get_state() != CELL_EMPTY):
+                grid[col, row].disable();
+
+    global edit_mode
+    edit_mode = False
+
 ###############################################
-# save_button_pressed()
+# solve_button_pressed()
 ###############################################
-def save_button_pressed():
+def solve_button_pressed():
     pass
 
 ###############################################
@@ -272,10 +304,10 @@ def initialise():
     global grid
         
     for col in range(CELL_COLS):
-        top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT)
+        top_number_strip[col] = NumberCell(CELL_WIDTH * col, 0, CELL_WIDTH, CELL_HEIGHT, 0)
    
     for row in range(CELL_ROWS):
-        right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT)
+        right_number_strip[row] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * row), CELL_WIDTH, CELL_HEIGHT, 0)
 
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):            

@@ -11,13 +11,15 @@ class NumberCell():
     __width = 0
     __height = 0
     __value = 0
+    __enabled = True
 
-    def __init__(self, x, y, width, height, value = 0):
+    def __init__(self, x, y, width, height, value = 0, enabled = True):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
         self.__value = value
+        self.__enabled = enabled
 
     def draw(self, screen):        
         pygame.draw.rect(screen, NUMBER_CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
@@ -37,7 +39,16 @@ class NumberCell():
         self.__value = (self.__value + 1) % cap
 
     def get_value(self, value):
-        return self.__value;
+        return self.__value
+
+    def is_enabled(self):
+        return self.__enabled
+
+    def enable(self):
+        self.__enabled = True
+    
+    def disable(self):
+        self.__enabled = False
 
 ###############################################
 # Cell()
@@ -49,13 +60,15 @@ class Cell():
     __width = 0
     __height = 0
     __state = CELL_EMPTY
+    __enabled = True
 
-    def __init__(self, x, y, width, height, state = CELL_EMPTY):
+    def __init__(self, x, y, width, height, state = CELL_EMPTY, enabled = True):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
         self.__state = state
+        self.__enabled = enabled
 
     def draw(self, screen, is_correct):     
         
@@ -119,8 +132,20 @@ class Cell():
     def inc_state(self):
         self.__state = (self.__state + 1) % TOTAL_CELL_STATES
 
+    def set_state(self, state):
+        self.__state = state
+
     def get_state(self):
         return self.__state
+
+    def is_enabled(self):
+        return self.__enabled
+
+    def enable(self):
+        self.__enabled = True
+    
+    def disable(self):
+        self.__enabled = False
 
 ###############################################
 # Label()
@@ -155,7 +180,6 @@ class Label():
         
     def set_label(self, label):
         self.__label = label
-
 
 ###############################################
 # Button()
