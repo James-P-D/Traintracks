@@ -1,7 +1,5 @@
 #TODO:
 #
-# * Play/Edit mode
-# * Make cells fixed for playmode and disable NumberCell
 # * Need to actually check path in is_complete
 
 import pygame # Tested with pygame v1.9.6
@@ -79,12 +77,16 @@ def game_loop():
                             if (grid[cell_col, cell_row].is_enabled()):
                                 grid[cell_col, cell_row].inc_state();
                                 grid[cell_col, cell_row].draw(screen, False);
-                                check_board_state()
+                                if (edit_mode):
+                                    check_board_state()
+                                elif (is_complete()):
+                                    message_label.set_label("Complete!")
+                                    message_label.draw(screen)
+
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
-            
-        #draw_grid()
+
         pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
@@ -214,7 +216,7 @@ def get_column_count(col):
 # get_row_count()
 ###############################################
 
-def get_row_count(col):
+def get_row_count(row):
     row_count = 0
     for col in range(CELL_COLS):
         if (grid[col, row].get_state() != CELL_EMPTY):
@@ -225,13 +227,38 @@ def get_row_count(col):
 # is_complete()
 ###############################################
 def is_complete():
+
+    def get_next_cell(col, row, visited_grid):
+
+        def check_cells(col1, row1, col2, row2, visited_grid):
+            next_cells = []
+            if ((col1 >= 0) and (col1 < CELL_COLS) and (row1 >= 0) and (row1 < CELL_ROWS) and not visited_grid[col1, row1]):
+                next_cells.append((col1, row1))
+            if ((col2 >= 0) and (col2 < CELL_COLS) and (row2 >= 0) and (row2 < CELL_ROWS) and not visited_grid[col2, row1]):
+                next_cells.append((col2, row2))
+            return next_cells            
+
+        state = grid[col, row].get_state()
+        if (state == CELL_EMPTY):
+            pass
+        elif (state == CELL_HORIZONTAL):
+            return check_cells(col + 1, row, col - 1, row, visited_grid)
+        elif (state == CELL_VERTICAL):
+            return check_cells(col, row - 1, col, row + 1, visited_grid)
+        elif (state == CELL_TOP_LEFT):
+            return check_cells(col, row - 1, col - 1, row, visited_grid)
+        elif (state == CELL_TOP_RIGHT):
+            return check_cells(col, row - 1, col + 1, row, visited_grid)
+        elif (state == CELL_BOTTOM_RIGHT):
+            return check_cells(col, row + 1, col + 1, row, visited_grid)
+        elif (state == CELL_BOTTOM_LEFT):
+            return check_cells(col, row + 1, col - 1, row, visited_grid)
+        return next_cells
+
     terminals = get_terminals()
     if len(get_terminals()) != 2:
         return False
-
-    first_terminal = terminals[0]
-    second_terminal = terminals[1]
-
+        
     for col in range(CELL_COLS):
         col_count = get_column_count(col)
         if (col_count != top_number_strip[col].get_value()):
@@ -242,9 +269,24 @@ def is_complete():
         if (row_count != right_number_strip[row].get_value()):
             return False
 
-    #TODO: Need to check that path is actually correct here also!
+    visited_grid = [[False] * CELL_COLS] * CELL_ROWS
 
-    return Treu;
+    (first_terminal_col, first_terminal_row) = terminals[0]
+    (last_terminal_col, last_terminal_row) = terminals[1]
+    col = first_terminal_col
+    row = first_terminal_row
+    while ((col != last_terminal_col) and (row != last_terminal_row)):
+        visited_grid[col_row] = True
+
+        current_cell_state = grid[col][row]
+        next_cells = get_next_cell(col, row, visited_grid)
+
+        if (len(next_cells) != 1):
+            false
+        
+        (col, row) = next_cells[0]
+
+    return True;
 
 ###############################################
 # draw_cell()

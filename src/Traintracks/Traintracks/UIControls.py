@@ -38,7 +38,7 @@ class NumberCell():
     def inc_value(self, cap):
         self.__value = (self.__value + 1) % cap
 
-    def get_value(self, value):
+    def get_value(self):
         return self.__value
 
     def is_enabled(self):
