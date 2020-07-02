@@ -72,7 +72,8 @@ def game_loop():
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
-                        print(f"({cell_col}, {cell_row})")
+                        
+                        #print(f"({cell_col}, {cell_row})")
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
                             if (grid[cell_col, cell_row].is_enabled()):
                                 grid[cell_col, cell_row].inc_state();
@@ -82,7 +83,9 @@ def game_loop():
                                 elif (is_complete()):
                                     message_label.set_label("Complete!")
                                     message_label.draw(screen)
-
+                                else:
+                                    message_label.set_label("")
+                                    message_label.draw(screen)
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -177,7 +180,6 @@ def get_terminals():
     if (grid[CELL_COLS - 1, CELL_ROWS - 1].get_state() not in [CELL_BOTTOM_RIGHT, CELL_TOP_LEFT, CELL_EMPTY]):
         terminals.append((CELL_COLS - 1, CELL_ROWS - 1))
 
-    print(f"terminals = {terminals}")
     return terminals
 
 ###############################################
@@ -232,13 +234,16 @@ def is_complete():
 
         def check_cells(col1, row1, col2, row2, visited_grid):
             next_cells = []
-            if ((col1 >= 0) and (col1 < CELL_COLS) and (row1 >= 0) and (row1 < CELL_ROWS) and not visited_grid[col1, row1]):
+            
+            if ((col1 >= 0) and (col1 < CELL_COLS) and (row1 >= 0) and (row1 < CELL_ROWS) and not visited_grid[col1][row1]):
                 next_cells.append((col1, row1))
-            if ((col2 >= 0) and (col2 < CELL_COLS) and (row2 >= 0) and (row2 < CELL_ROWS) and not visited_grid[col2, row1]):
-                next_cells.append((col2, row2))
+            if ((col2 >= 0) and (col2 < CELL_COLS) and (row2 >= 0) and (row2 < CELL_ROWS) and not visited_grid[col2][row2]):
+                visited2 = visited_grid[col2][row2]
+                if (not visited2):
+                    next_cells.append((col2, row2))
             return next_cells            
 
-        state = grid[col, row].get_state()
+        state = grid[col][row].get_state()
         if (state == CELL_EMPTY):
             pass
         elif (state == CELL_HORIZONTAL):
@@ -268,25 +273,23 @@ def is_complete():
         row_count = get_row_count(row)
         if (row_count != right_number_strip[row].get_value()):
             return False
-
-    visited_grid = [[False] * CELL_COLS] * CELL_ROWS
+    
+    visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype=bool)
 
     (first_terminal_col, first_terminal_row) = terminals[0]
     (last_terminal_col, last_terminal_row) = terminals[1]
     col = first_terminal_col
     row = first_terminal_row
     while ((col != last_terminal_col) and (row != last_terminal_row)):
-        visited_grid[col_row] = True
-
-        current_cell_state = grid[col][row]
+        visited_grid[col][row] = True
         next_cells = get_next_cell(col, row, visited_grid)
 
         if (len(next_cells) != 1):
-            false
+            return False
         
         (col, row) = next_cells[0]
 
-    return True;
+    return True
 
 ###############################################
 # draw_cell()
@@ -390,6 +393,44 @@ def set_default_game():
             if(grid[col, row] == None):
                 grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
 
+def set_other_default_game():
+    global top_number_strip
+    global right_number_strip    
+    global grid
+    top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    top_number_strip[3] = NumberCell(CELL_WIDTH * 3, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[4] = NumberCell(CELL_WIDTH * 4, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[5] = NumberCell(CELL_WIDTH * 5, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[6] = NumberCell(CELL_WIDTH * 6, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[7] = NumberCell(CELL_WIDTH * 7, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 0)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 5)
+    right_number_strip[3] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 3), CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[4] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 4), CELL_WIDTH, CELL_HEIGHT, 4)
+    right_number_strip[5] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 5), CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[6] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 6), CELL_WIDTH, CELL_HEIGHT, 0)
+    right_number_strip[7] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 7), CELL_WIDTH, CELL_HEIGHT, 0)
+    
+    grid[0, 2] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[1, 1] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_RIGHT)
+    grid[2, 1] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
+    grid[2, 2] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_RIGHT)
+    grid[3, 2] = Cell(CELL_WIDTH * 3, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[4, 2] = Cell(CELL_WIDTH * 4, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
+    grid[4, 3] = Cell(CELL_WIDTH * 4, (CELL_HEIGHT * (3 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_VERTICAL)
+    grid[4, 4] = Cell(CELL_WIDTH * 4, (CELL_HEIGHT * (4 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_RIGHT)
+    grid[5, 4] = Cell(CELL_WIDTH * 5, (CELL_HEIGHT * (4 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[6, 4] = Cell(CELL_WIDTH * 6, (CELL_HEIGHT * (4 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[7, 4] = Cell(CELL_WIDTH * 7, (CELL_HEIGHT * (4 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
+    grid[7, 5] = Cell(CELL_WIDTH * 7, (CELL_HEIGHT * (5 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_RIGHT)
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):            
+            if(grid[col, row] == None):
+                grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
 ###############################################
 # main()
 ###############################################
@@ -398,7 +439,9 @@ def main():
     pygame.init()
     
     #initialise()
-    set_default_game()
+    #set_default_game()
+    set_other_default_game()
+
     draw_ui()
 
     game_loop()
