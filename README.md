@@ -18,9 +18,9 @@ The objective of the game is to complete the traintrack between start point **A*
 
 For Python we need the following:
 
-[pygame](https://www.pygame.org/news) (Tested with v1.9.6)
-[numpy](https://numpy.org/) (Tested with v1.18.3)
-[pyjulia](https://github.com/JuliaPy/pyjulia) (Tested with v0.5.3)
+[pygame](https://www.pygame.org/news) (Tested with v1.9.6)  
+[numpy](https://numpy.org/) (Tested with v1.18.3)  
+[pyjulia](https://github.com/JuliaPy/pyjulia) (Tested with v0.5.3)  
 
 ```
 pip install pygame
