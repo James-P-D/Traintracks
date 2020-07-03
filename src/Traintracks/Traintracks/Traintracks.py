@@ -1,5 +1,6 @@
 #TODO:
-#
+# * Given that we are having to reproduce a bunch of code in julia for checking if solution is correct, why not
+#   call those functions for Python when in Play mode?
 
 import pygame # Tested with pygame v1.9.6
 import numpy as np
