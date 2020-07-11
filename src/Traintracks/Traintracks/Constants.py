@@ -79,12 +79,8 @@ NUMBER_CELL_LABEL_COLOR = WHITE
 NUMBER_CELL_FONT_SIZE = FONT_SIZE
 
 ###############################################
-# Cell States
+# Cell States - All read from Julia file
 ###############################################
-
-CELL_BORDER_SIZE = 2
-CELL_BORDER_COLOR = LIGHT_GRAY
-CELL_COLOR = WHITE
 
 CELL_EMPTY = Main.CELL_EMPTY
 CELL_HORIZONTAL = Main.CELL_HORIZONTAL
@@ -94,6 +90,14 @@ CELL_TOP_RIGHT = Main.CELL_TOP_RIGHT
 CELL_BOTTOM_RIGHT = Main.CELL_BOTTOM_RIGHT
 CELL_BOTTOM_LEFT = Main.CELL_BOTTOM_LEFT
 TOTAL_CELL_STATES = Main.TOTAL_CELL_STATES
+
+###############################################
+# Cell Colors and Sizes
+###############################################
+
+CELL_BORDER_SIZE = 2
+CELL_BORDER_COLOR = LIGHT_GRAY
+CELL_COLOR = WHITE
 
 CELL_TRACK_GOOD_COLOR = GREEN
 CELL_TRACK_BAD_COLOR = RED
