@@ -5,6 +5,7 @@ CELL_TOP_LEFT = 3
 CELL_TOP_RIGHT = 4
 CELL_BOTTOM_RIGHT = 5
 CELL_BOTTOM_LEFT = 6
+TOTAL_CELL_STATES = 7
 
 function check_board(cell_cols, cell_rows, top_numbers, right_numbers, grid)
 	for col = 1:cell_cols

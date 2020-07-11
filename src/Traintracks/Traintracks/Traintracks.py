@@ -6,6 +6,8 @@ import pygame # Tested with pygame v1.9.6
 import numpy as np
 from Constants import *
 from UIControls import *
+from julia import Main
+Main.include('library.jl')
     
 ###############################################
 # Globals
@@ -158,12 +160,9 @@ def solve_button_pressed():
     right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
     grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
     
-    from julia import Main
-    Main.include('library.jl')
     a = Main.solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)
 
     print(a)
-
 
 ###############################################
 # get_terminals()
@@ -327,7 +326,6 @@ def draw_cell(col, row, value, is_correct):
         pass
     elif (value == CELL_BOTTOM_LEFT):
         pass
-        
 
 ###############################################
 # draw_ui()
