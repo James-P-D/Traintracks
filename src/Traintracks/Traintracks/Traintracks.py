@@ -64,12 +64,12 @@ def game_loop():
                     
                     if ((cell_row == 0) and (cell_col != CELL_COLS)):
                         if (top_number_strip[cell_col].is_enabled()):
-                            top_number_strip[cell_col].inc_value(CELL_ROWS)
+                            top_number_strip[cell_col].inc_value(CELL_ROWS + 1)
                             top_number_strip[cell_col].draw(screen)
                     elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
                             cell_row -= 1
                             if (right_number_strip[cell_row].is_enabled()):
-                                right_number_strip[cell_row].inc_value(CELL_ROWS)
+                                right_number_strip[cell_row].inc_value(CELL_COLS + 1)
                                 right_number_strip[cell_row].draw(screen)
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
@@ -450,9 +450,9 @@ def set_other_default_game():
 def main():
     pygame.init()
     
-    #initialise()
+    initialise()
     #set_default_game()
-    set_other_default_game()
+    #set_other_default_game()
 
     draw_ui()
 
