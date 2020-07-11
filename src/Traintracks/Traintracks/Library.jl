@@ -7,9 +7,10 @@ CELL_BOTTOM_RIGHT = 5
 CELL_BOTTOM_LEFT = 6
 TOTAL_CELL_STATES = 7
 
-function check_board(cell_cols, cell_rows, top_numbers, right_numbers, grid)
-	for col = 1:cell_cols
+function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, grid)
+	for col = 1:cell_cols    
 		println("checking col ", col)
+
 		total = 0
 	    for row = 1:cell_rows
 			if (grid[col, row] != CELL_EMPTY)
@@ -17,7 +18,7 @@ function check_board(cell_cols, cell_rows, top_numbers, right_numbers, grid)
 			end
 		end 
 		if (top_numbers[col] != total)
-			println("fail expected ", top_numbers[col], " but got", total)
+			println("fail expected ", top_numbers[col], " but got ", total)
 			return false
 		else
 			println("Success")
@@ -33,12 +34,16 @@ function check_board(cell_cols, cell_rows, top_numbers, right_numbers, grid)
 			end
 		end 
 		if (right_numbers[row] != total)
-			println("fail expected ", right_numbers[row], " but got", total)
+			println("fail expected ", right_numbers[row], " but got ", total)
 			return false
 		else
 			println("Success")
 		end
     end
+
+    # Create an array cell_cols-by-cell_rows in size, initialised to false
+    visited_grid = fill(false, cell_cols, cell_rows)
+
 
 	return true
 end
@@ -59,5 +64,5 @@ function solve(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal,
     #    println(some_array[col, row])
     #end
 
-	return check_board(cell_cols, cell_rows, top_numbers, right_numbers, grid)
+	return is_complete(cell_cols, cell_rows, top_numbers, right_numbers, grid)
 end

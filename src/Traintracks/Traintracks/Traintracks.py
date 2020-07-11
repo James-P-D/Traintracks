@@ -82,12 +82,17 @@ def game_loop():
                                 grid[cell_col, cell_row].draw(screen, False);
                                 if (edit_mode):
                                     check_board_state()
-                                elif (is_complete()):
-                                    message_label.set_label("Complete!")
-                                    message_label.draw(screen)
                                 else:
-                                    message_label.set_label("")
-                                    message_label.draw(screen)
+                                    top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
+                                    right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
+                                    grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
+
+                                    if (Main.is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, grid_numbers)):
+                                        message_label.set_label("Complete!")
+                                        message_label.draw(screen)
+                                    else:
+                                        message_label.set_label("")
+                                        message_label.draw(screen)
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()                
@@ -450,9 +455,9 @@ def set_other_default_game():
 def main():
     pygame.init()
     
-    initialise()
+    #initialise()
     #set_default_game()
-    #set_other_default_game()
+    set_other_default_game()
 
     draw_ui()
 
