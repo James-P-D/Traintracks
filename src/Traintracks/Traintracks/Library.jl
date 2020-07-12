@@ -40,6 +40,7 @@ function get_next_cell(cell_cols, cell_rows, col, row, visited_grid, grid)
 end
 
 function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal, end_terminal, grid)
+    println("is_complete()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	for col = 1:cell_cols    
 		println("checking col ", col)
 
@@ -123,10 +124,34 @@ function get_possible_states(current_col, current_row, next_col, next_row, grid)
     end
 end
 
-function sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, current_col, current_row, end_col, end_row, visited_grid, grid, moves)
+function draw_grid(cell_cols, cell_rows, grid)
+    println("+--------+")
+    for row = 1:cell_rows
+        print("|")
+        for col = 1:cell_cols
+            if(grid[col,row]==CELL_EMPTY)
+                print(" ")
+            else
+                print(grid[col,row])
+            end
+		end
+        println("|")
+    end
+    println("+--------+")
+end
+
+function sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, current_col, current_row, end_col, end_row, visited_grid, start_terminal, end_terminal, grid, moves)
     println("sub_solve")
+    println("current_col = ", current_col)
+    println("current_row = ", current_row)
+    draw_grid(cell_cols, cell_rows, grid)
+    
     if ((current_col == end_col) && (current_row == end_row))
-        return (true, moves)
+        if (is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal, end_terminal, grid))
+            return (true, moves)
+        else
+            return (false, moves)
+        end
     else
         visited_grid[current_col, current_row] = true   
         next_cells = get_next_cell(cell_cols, cell_rows, current_col, current_row, visited_grid, grid)
@@ -134,18 +159,26 @@ function sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, current_col
         if (length(next_cells) != 1)
             return (false, [])
         else
-            println("current_col = ", current_col)
-            println("current_row = ", current_row)
             (next_col, next_row) = next_cells[1]
             println("next_col = ", next_col)
             println("next_row = ", next_row)
             
             if (grid[next_col, next_row] != CELL_EMPTY)
-                return sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, next_col, next_row, end_col, end_row, visited_grid, grid, moves)
+                println("Already at a permanent cell!")
+                return sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, next_col, next_row, end_col, end_row, visited_grid, start_terminal, end_terminal, grid, moves)
             else
                 possible_states = get_possible_states(current_col, current_row, next_col, next_row, grid)
                 for possible_state in possible_states
                     println("possible_state = ", possible_state)
+                    grid[next_col, next_row] = possible_state
+                    (successful, new_moves) = sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, next_col, next_row, end_col, end_row, visited_grid, start_terminal, end_terminal, grid, moves)
+                    if (successful)
+                        println("possible_state = ", possible_state, " worked!")
+                        return (true, [])
+                    else
+                        println("possible_state = ", possible_state, " failed")
+                        grid[next_col, next_row] = CELL_EMPTY
+                    end
                 end
                 return (false, moves)
             end            
@@ -161,5 +194,5 @@ function solve(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal,
     # Create an array cell_cols-by-cell_rows in size, initialised to false
     visited_grid = fill(false, cell_cols, cell_rows)
          
-    return sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, start_col + 1, start_row + 1, end_col + 1, end_row + 1, visited_grid, grid, [])
+    return sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, start_col + 1, start_row + 1, end_col + 1, end_row + 1, visited_grid, start_terminal, end_terminal, grid, [])
 end
