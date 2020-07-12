@@ -1,5 +1,14 @@
+###############################################
+# Imports - Include Julia since we will need
+# to get the Cell State constants
+###############################################
+
 from julia import Main
 Main.include('library.jl')
+
+###############################################
+# Main UI component sizes
+###############################################
 
 CELL_COLS = 8
 CELL_ROWS = 8
@@ -108,5 +117,5 @@ CELL_TRACK_SIZE = 4
 ###############################################
 
 CLOCK_TICK = 30
-SMALL_SLEEP = 0.01
-BIG_SLEEP = 0.5
+#SMALL_SLEEP = 0.01
+#BIG_SLEEP = 0.5
