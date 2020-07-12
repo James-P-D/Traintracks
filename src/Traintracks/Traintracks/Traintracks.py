@@ -15,9 +15,7 @@ Main.include('library.jl')
 
 top_number_strip = np.ndarray(CELL_COLS, NumberCell)
 right_number_strip = np.ndarray(CELL_ROWS, NumberCell)
-
 grid = np.ndarray((CELL_COLS, CELL_ROWS), Cell)
-
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 message_label = Label(0, MESSAGE_STRIP_TOP, MESSAGE_RIBBON_WIDTH, MESSAGE_RIBBON_HEIGHT)
@@ -92,11 +90,8 @@ def game_loop():
                                             message_label.set_label("Complete!")
                                             message_label.draw(screen)
                                         else:
-                                            message_label.set_label("")
+                                            message_label.set_label("Incomplete")
                                             message_label.draw(screen)
-                
-            elif event.type == pygame.MOUSEBUTTONUP:
-                (mouse_x, mouse_y) = pygame.mouse.get_pos()                
 
         pygame.display.update()
         clock.tick(CLOCK_TICK)
@@ -165,10 +160,14 @@ def solve_button_pressed():
     top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
     right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
     grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
-    
-    a = Main.solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)
-
-    print(a)
+    terminals = get_terminals()
+                                    
+    if (Main.is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)):
+        message_label.set_label("Complete!")
+        message_label.draw(screen)
+    else:
+        a = Main.solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)
+        print(a)
 
 ###############################################
 # get_terminals()
