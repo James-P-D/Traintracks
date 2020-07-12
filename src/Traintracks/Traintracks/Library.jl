@@ -7,41 +7,39 @@ CELL_BOTTOM_RIGHT = 5
 CELL_BOTTOM_LEFT = 6
 TOTAL_CELL_STATES = 7
 
-function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal, end_terminal, grid)
-
-    function get_next_cell(col, row, visited_grid)
+function check_cells(cell_cols, cell_rows, col1, row1, col2, row2, visited_grid)
+    next_cells = []
     
-        function check_cells(col1, row1, col2, row2, visited_grid)
-            next_cells = []
-            
-            if ((col1 > 0) && (col1 <= cell_cols) && (row1 > 0) && (row1 <= cell_rows) && (!visited_grid[col1, row1]))
-                push!(next_cells, (col1, row1))                
-            end
-            if ((col2 > 0) && (col2 <= cell_cols) && (row2 > 0) && (row2 <= cell_rows) && (!visited_grid[col2, row2]))
-                if (!(visited_grid[col2, row2]))
-                    push!(next_cells, (col2, row2))
-                end
-            end
-            return next_cells            
-        end
-        
-        state = grid[col, row]
-        if (state == CELL_HORIZONTAL)
-            return check_cells(col + 1, row, col - 1, row, visited_grid)
-        elseif (state == CELL_VERTICAL)
-            return check_cells(col, row - 1, col, row + 1, visited_grid)
-        elseif (state == CELL_TOP_LEFT)
-            return check_cells(col, row - 1, col - 1, row, visited_grid)
-        elseif (state == CELL_TOP_RIGHT)
-            return check_cells(col, row - 1, col + 1, row, visited_grid)
-        elseif (state == CELL_BOTTOM_RIGHT)
-            return check_cells(col, row + 1, col + 1, row, visited_grid)
-        elseif (state == CELL_BOTTOM_LEFT)
-            return check_cells(col, row + 1, col - 1, row, visited_grid)
-        end
-        return next_cells
+    if ((col1 > 0) && (col1 <= cell_cols) && (row1 > 0) && (row1 <= cell_rows) && (!visited_grid[col1, row1]))
+        push!(next_cells, (col1, row1))        
     end
-    
+    if ((col2 > 0) && (col2 <= cell_cols) && (row2 > 0) && (row2 <= cell_rows) && (!visited_grid[col2, row2]))
+        if (!(visited_grid[col2, row2]))
+            push!(next_cells, (col2, row2))
+        end
+    end
+    return next_cells            
+end
+
+function get_next_cell(cell_cols, cell_rows, col, row, visited_grid, grid)
+    state = grid[col, row]
+    if (state == CELL_HORIZONTAL)
+        return check_cells(cell_cols, cell_rows, col + 1, row, col - 1, row, visited_grid)
+    elseif (state == CELL_VERTICAL)
+        return check_cells(cell_cols, cell_rows, col, row - 1, col, row + 1, visited_grid)
+    elseif (state == CELL_TOP_LEFT)
+        return check_cells(cell_cols, cell_rows, col, row - 1, col - 1, row, visited_grid)
+    elseif (state == CELL_TOP_RIGHT)
+        return check_cells(cell_cols, cell_rows, col, row - 1, col + 1, row, visited_grid)
+    elseif (state == CELL_BOTTOM_RIGHT)
+        return check_cells(cell_cols, cell_rows, col, row + 1, col + 1, row, visited_grid)
+    elseif (state == CELL_BOTTOM_LEFT)
+        return check_cells(cell_cols, cell_rows, col, row + 1, col - 1, row, visited_grid)
+    end
+    return next_cells
+end
+
+function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal, end_terminal, grid)
 	for col = 1:cell_cols    
 		println("checking col ", col)
 
@@ -82,7 +80,7 @@ function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_ter
     while ((col != end_terminal_col + 1) && (row != end_terminal_row + 1))
         visited_grid[col, row] = true
         
-        next_cells = get_next_cell(col, row, visited_grid)
+        next_cells = get_next_cell(cell_cols, cell_rows, col, row, visited_grid, grid)
 
         if (length(next_cells) != 1)
             return false
