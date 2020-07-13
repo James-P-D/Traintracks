@@ -10,10 +10,10 @@ Main.include('library.jl')
 # Main UI component sizes
 ###############################################
 
-CELL_COLS = 8
-CELL_ROWS = 8
+CELL_COLS = 3
+CELL_ROWS = 3
 
-CELL_WIDTH = 50
+CELL_WIDTH = 150
 CELL_HEIGHT = CELL_WIDTH
 
 WINDOW_WIDTH = (CELL_COLS + 1) * CELL_WIDTH
