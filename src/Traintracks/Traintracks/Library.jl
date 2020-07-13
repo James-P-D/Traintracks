@@ -40,10 +40,9 @@ function get_next_cell(cell_cols, cell_rows, col, row, visited_grid, grid)
 end
 
 function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal, end_terminal, grid)
-    println("is_complete()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    println("is_complete()")
 	for col = 1:cell_cols    
-		println("checking col ", col)
-
+		#println("checking col ", col)
 		total = 0
 	    for row = 1:cell_rows
 			if (grid[col, row] != CELL_EMPTY)
@@ -51,13 +50,13 @@ function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_ter
 			end
 		end 
 		if (top_numbers[col] != total)
-			println("fail expected ", top_numbers[col], " but got ", total)
+			#println("fail expected ", top_numbers[col], " but got ", total)
 			return false
 		end
     end
 
 	for row = 1:cell_rows
-		println("checking row ", row)
+		#println("checking row ", row)
 		total = 0
 	    for col = 1:cell_cols
 			if (grid[col, row] != CELL_EMPTY)
@@ -70,6 +69,9 @@ function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_ter
 		end
     end
 
+    println("is_complete() - Columns and rows are fine")
+	
+
     # Create an array cell_cols-by-cell_rows in size, initialised to false
     visited_grid = fill(false, cell_cols, cell_rows)
 
@@ -79,19 +81,40 @@ function is_complete(cell_cols, cell_rows, top_numbers, right_numbers, start_ter
     current_row = start_terminal_row + 1
     end_col = end_terminal_col + 1
     end_row = end_terminal_row + 1
-    
-    while ((current_col != end_col) && (current_row != end_row))
+
+    println("end_col = ", end_col)
+    println("end_row = ", end_row)
+    while ((current_col != end_col) || (current_row != end_row))
         visited_grid[current_col, current_row] = true
         
         next_cells = get_next_cell(cell_cols, cell_rows, current_col, current_row, visited_grid, grid)
 
         if (length(next_cells) != 1)
+            println("is_complete() - FALSE! No next cells")
             return false
         end
         
-        (current_col, current_row) = next_cells[1]
+        (next_col, next_row) = next_cells[1]
+        
+        possible_next_states = get_possible_states(current_col, current_row, next_col, next_row, grid)
+        println("Possible pieces for (", next_col, ", ", next_row, ") are ", possible_next_states)
+        if(!(grid[next_col, next_row] in possible_next_states))
+            println("is_complete() - FALSE! Doesn't connect")
+            return false
+        end
+        
+        current_col = next_col
+        current_row = next_row
+        println("current_col = ", current_col)
+        println("current_row = ", current_row)
+        println("end_col = ", end_col)
+        println("end_row = ", end_row)
+        println("((current_col != end_col) && (current_row != end_row)) = ", ((current_col != end_col) && (current_row != end_row)))
     end
 
+    println("(current_col != end_col) = ", (current_col != end_col))
+    println("(current_row != end_row) = ", (current_row != end_row))
+    println("is_complete() - TRUE!")
 	return true
 end
 
@@ -108,20 +131,15 @@ function get_possible_states(current_col, current_row, next_col, next_row, grid)
             return [CELL_VERTICAL, CELL_BOTTOM_LEFT, CELL_BOTTOM_RIGHT]
         elseif (next_row > current_row)
             return [CELL_VERTICAL, CELL_TOP_LEFT, CELL_TOP_RIGHT]
-        else
-            throw(DomainError(0, "something went wrong 1!"))
         end
     elseif (current_row == next_row)
         if (next_col < current_col)
             return [CELL_HORIZONTAL, CELL_TOP_RIGHT, CELL_BOTTOM_RIGHT]
         elseif (next_col > current_col)
             return [CELL_HORIZONTAL, CELL_BOTTOM_LEFT, CELL_TOP_LEFT]
-        else
-            throw(DomainError(0, "something went wrong 2!"))
         end
-    else
-        throw(DomainError(0, "something went wrong 3!"))
     end
+    return []
 end
 
 function draw_grid(cell_cols, cell_rows, grid)
@@ -194,5 +212,10 @@ function solve(cell_cols, cell_rows, top_numbers, right_numbers, start_terminal,
     # Create an array cell_cols-by-cell_rows in size, initialised to false
     visited_grid = fill(false, cell_cols, cell_rows)
          
-    return sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, start_col + 1, start_row + 1, end_col + 1, end_row + 1, visited_grid, start_terminal, end_terminal, grid, [])
+    (successful, moves) = sub_solve(cell_cols, cell_rows, top_numbers, right_numbers, start_col + 1, start_row + 1, end_col + 1, end_row + 1, visited_grid, start_terminal, end_terminal, grid, [])
+    if (successful)
+        draw_grid(cell_cols, cell_rows, grid)
+    end
+    return successful
+
 end
