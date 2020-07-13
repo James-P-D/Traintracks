@@ -1,6 +1,5 @@
 #TODO:
-# * Given that we are having to reproduce a bunch of code in julia for checking if solution is correct, why not
-#   call those functions for Python when in Play mode?
+# * is_complete() doesn't work properly! need to actually trace line, not just count!
 
 import pygame # Tested with pygame v1.9.6
 import numpy as np
@@ -360,6 +359,24 @@ def set_other_default_game():
             if(grid[col, row] == None):
                 grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
 
+def set_very_basic_game():
+    global top_number_strip
+    global right_number_strip    
+    global grid
+    top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 2)
+    
+    grid[0, 0] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[2, 2] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):            
+            if(grid[col, row] == None):
+                grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
 ###############################################
 # main()
 ###############################################
@@ -369,7 +386,8 @@ def main():
     
     #initialise()
     #set_default_game()
-    set_other_default_game()
+    #set_other_default_game()
+    set_very_basic_game()
 
     draw_ui()
 
