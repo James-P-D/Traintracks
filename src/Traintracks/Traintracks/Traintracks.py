@@ -115,9 +115,6 @@ def clear_button_pressed():
 # edit_button_pressed()
 ###############################################
 def edit_button_pressed():
-    play_button.disable()
-    play_button.draw(screen)
-
     for col in range(CELL_COLS):
         top_number_strip[col].enable()
         check_top_number_strip(col)
