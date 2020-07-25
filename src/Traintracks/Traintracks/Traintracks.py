@@ -81,6 +81,19 @@ def game_loop():
                                 else:                    
                                     check_top_number_strip(cell_col)
                                     check_right_number_strip(cell_row)
+
+                                    terminals = get_terminals()
+                                    if len(get_terminals()) != 2:
+                                        message_label.set_label("You must specify 2 terminal points")
+                                        message_label.draw(screen)
+                                    elif (is_complete(terminals[0], terminals[1])):
+                                        message_label.set_label("Complete!")
+                                        message_label.draw(screen)
+                                    else:
+                                        message_label.set_label("Incomplete")
+                                        message_label.draw(screen)
+
+
                                     # TODO: Check if board is complete if user playing?
 
         pygame.display.update()
@@ -140,6 +153,87 @@ def play_button_pressed():
     global edit_mode
     edit_mode = False
 
+def get_next_cell(cell_cols, cell_rows, col, row, visited_grid):
+    def get_next_cell_list(cell_cols, cell_rows, col1, row1, col2, row2, visited_grid):
+        next_cells = []
+            
+        if ((col1 >= 0) and (col1 < CELL_COLS) and (row1 >= 0) and (row1 < CELL_ROWS) and not visited_grid[col1][row1]):
+            next_cells.append((col1, row1))
+        if ((col2 >= 0) and (col2 < CELL_COLS) and (row2 >= 0) and (row2 < CELL_ROWS) and not visited_grid[col2][row2]):
+            visited2 = visited_grid[col2][row2]
+            if (not visited2):
+                next_cells.append((col2, row2))
+        return next_cells            
+
+    state = grid[col][row].get_state()
+    if (state == CELL_EMPTY):
+        pass
+    elif (state == CELL_HORIZONTAL):
+        return get_next_cell_list(cell_cols, cell_rows, col + 1, row, col - 1, row, visited_grid)
+    elif (state == CELL_VERTICAL):
+        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col, row + 1, visited_grid)
+    elif (state == CELL_TOP_LEFT):
+        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col - 1, row, visited_grid)
+    elif (state == CELL_TOP_RIGHT):
+        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col + 1, row, visited_grid)
+    elif (state == CELL_BOTTOM_RIGHT):
+        return get_next_cell_list(cell_cols, cell_rows, col, row + 1, col + 1, row, visited_grid)
+    elif (state == CELL_BOTTOM_LEFT):
+        return get_next_cell_list(cell_cols, cell_rows, col, row + 1, col - 1, row, visited_grid)
+    return []
+
+def get_possible_states(current_col, current_row, next_col, next_row):
+    current_cell_state = grid[current_col][current_row].get_state()
+    if (current_col == next_col):
+        if (next_row < current_row):
+            return [CELL_VERTICAL, CELL_BOTTOM_LEFT, CELL_BOTTOM_RIGHT]
+        elif (next_row > current_row):
+            return [CELL_VERTICAL, CELL_TOP_LEFT, CELL_TOP_RIGHT]
+    elif (current_row == next_row):
+        if (next_col < current_col):
+            return [CELL_HORIZONTAL, CELL_TOP_RIGHT, CELL_BOTTOM_RIGHT]
+        elif (next_col > current_col):
+            return [CELL_HORIZONTAL, CELL_BOTTOM_LEFT, CELL_TOP_LEFT]
+    return []
+
+def is_complete(start_terminal, end_terminal):
+    for col in range(CELL_COLS):
+        if (col_diff(col) != 0):
+            return False
+        
+    for row in range(CELL_ROWS):
+        if (row_diff(row)) != 0:
+            return False
+        
+    visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype=bool)
+
+    (start_terminal_col, start_terminal_row) = start_terminal
+    (end_terminal_col, end_terminal_row) = end_terminal
+    current_col = start_terminal_col
+    current_row = start_terminal_row
+    end_col = end_terminal_col
+    end_row = end_terminal_row
+
+    while ((current_col != end_col) or (current_row != end_row)):
+        visited_grid[current_col][current_row] = True
+        
+        next_cells = get_next_cell(CELL_COLS, CELL_ROWS, current_col, current_row, visited_grid)
+
+        if (len(next_cells) != 1):
+            return False
+        
+        (next_col, next_row) = next_cells[0]
+        
+        possible_next_states = get_possible_states(current_col, current_row, next_col, next_row)
+        if(not (grid[next_col][next_row].get_state() in possible_next_states)):
+            return False
+        
+        current_col = next_col
+        current_row = next_row
+
+    return True
+
+
 ###############################################
 # solve_button_pressed()
 ###############################################
@@ -150,21 +244,23 @@ def solve_button_pressed():
     ################################################
 
     def solve():
+        terminals = get_terminals()
+        if len(get_terminals()) != 2:
+            # This shouldn't ever happen, since [Solve] button shouldn't be enabled, but just incase..
+            message_label.set_label("You must specify 2 terminal points")
+            message_label.draw(screen)
+            return
+        
         global processing
+        processing = True
+
+        if (is_complete(terminals[0], terminals[1])):
+            message_label.set_label("Complete!")
+            message_label.draw(screen)
+
         processing = False
 
-    ################################################
-
-    terminals = get_terminals()
-    if len(get_terminals()) != 2:
-        # This shouldn't ever happen, since [Solve] button shouldn't be enabled, but just incase..
-        message_label.set_label("You must specify 2 terminal points")
-        message_label.draw(screen)
-        return False
-        
-    global processing
-    processing = True
-
+    
     thread = threading.Thread(target = solve, args = ())
     thread.start()                    
 
