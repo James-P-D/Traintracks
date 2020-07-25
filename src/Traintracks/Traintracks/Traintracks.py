@@ -5,8 +5,6 @@ import pygame # Tested with pygame v1.9.6
 import numpy as np
 from Constants import *
 from UIControls import *
-from julia import Main
-Main.include('library.jl')
     
 ###############################################
 # Globals
@@ -64,10 +62,10 @@ def game_loop():
                             top_number_strip[cell_col].inc_value(CELL_ROWS + 1)
                             top_number_strip[cell_col].draw(screen)
                     elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
-                            cell_row -= 1
-                            if (right_number_strip[cell_row].is_enabled()):
-                                right_number_strip[cell_row].inc_value(CELL_COLS + 1)
-                                right_number_strip[cell_row].draw(screen)
+                        cell_row -= 1
+                        if (right_number_strip[cell_row].is_enabled()):
+                            right_number_strip[cell_row].inc_value(CELL_COLS + 1)
+                            right_number_strip[cell_row].draw(screen)
                     else:
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
@@ -79,18 +77,21 @@ def game_loop():
                                 grid[cell_col, cell_row].draw(screen, False);
                                 if (edit_mode):
                                     check_board_state()
-                                else:
-                                    top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
-                                    right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
-                                    grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
-                                    terminals = get_terminals()
-                                    if len(get_terminals()) == 2:
-                                        if (Main.is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)):
-                                            message_label.set_label("Complete!")
-                                            message_label.draw(screen)
-                                        else:
-                                            message_label.set_label("Incomplete")
-                                            message_label.draw(screen)
+                                else:                    
+                                    check_top_number_strip(cell_col)
+                                    check_right_number_strip(cell_row)
+
+                                    #top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
+                                    #right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
+                                    #grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
+                                    #terminals = get_terminals()
+                                    #if len(get_terminals()) == 2:
+                                    #    if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)):
+                                    #        message_label.set_label("Complete!")
+                                    #        message_label.draw(screen)
+                                    #    else:
+                                    #        message_label.set_label("Incomplete")
+                                    #        message_label.draw(screen)
 
         pygame.display.update()
         clock.tick(CLOCK_TICK)
@@ -119,8 +120,10 @@ def edit_button_pressed():
 
     for col in range(CELL_COLS):
         top_number_strip[col].enable()
+        check_top_number_strip(col)
     for row in range(CELL_ROWS):
         right_number_strip[row].enable()    
+        check_right_number_strip(row)
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
             grid[col, row].enable();
@@ -137,12 +140,15 @@ def play_button_pressed():
 
     for col in range(CELL_COLS):
         top_number_strip[col].disable()
+        check_top_number_strip(col)
     for row in range(CELL_ROWS):
         right_number_strip[row].disable()    
+        check_right_number_strip(row)
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
             if (grid[col, row].get_state() != CELL_EMPTY):
                 grid[col, row].disable();
+                grid[col, row].draw(screen, False)
 
     global edit_mode
     edit_mode = False
@@ -161,12 +167,22 @@ def solve_button_pressed():
     grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
     terminals = get_terminals()
                                     
-    if (Main.is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)):
+    if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])):
         message_label.set_label("Complete!")
         message_label.draw(screen)
     else:
-        a = Main.solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)
-        print(a)
+        (success, new_grid) = Main_solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])
+        if (success):
+            message_label.set_label("Complete!")
+            message_label.draw(screen)
+            for col in range(CELL_COLS):
+                for row in range(CELL_ROWS):
+                    new_state = new_grid[col][row]
+                    grid[col, row].set_state(new_state)
+                    grid[col, row].draw(screen, True)
+        else:
+            message_label.set_label("No solution found!")
+            message_label.draw(screen)
 
 ###############################################
 # get_terminals()
@@ -219,10 +235,63 @@ def check_board_state():
     solve_button.draw(screen)
     message_label.set_label("")
     message_label.draw(screen)
+
+###############################################
+# col_diff()
+###############################################
+
+def col_diff(col):
+    total = 0
+    for row in range(CELL_ROWS):
+        if (grid[col][row].get_state() != CELL_EMPTY):
+            total += 1
+        
+    return (top_number_strip[col].get_value() - total)
+
+###############################################
+# row_diff()
+###############################################
+
+def row_diff(row):
+    total = 0
+    for col in range(CELL_COLS):
+        if (grid[col][row].get_state() != CELL_EMPTY):
+            total += 1
+        
+    return (right_number_strip[row].get_value() - total)
+
+###############################################
+# check_top_number_strip()
+###############################################
+
+def check_top_number_strip(col):
+    if (edit_mode):
+        top_number_strip[col].set_incorrect()
+    else:
+        if (col_diff(col) == 0):
+            top_number_strip[col].set_correct()
+        else:
+            top_number_strip[col].set_incorrect()
+    top_number_strip[col].draw(screen)
+
+###############################################
+# check_right_number_strip()
+###############################################
+
+def check_right_number_strip(row):
+    if (edit_mode):
+        right_number_strip[row].set_incorrect()
+    else:
+        if (row_diff(row) == 0):
+            right_number_strip[row].set_correct()
+        else:
+            right_number_strip[row].set_incorrect()
+    right_number_strip[row].draw(screen)
         
 ###############################################
 # draw_cell()
 ###############################################
+
 def draw_cell(col, row, value, is_correct):        
     pygame.draw.rect(screen, CELL_BORDER_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT), 0)        
     pygame.draw.rect(screen, CELL_COLOR, (col * CELL_WIDTH, (row + 1) * CELL_HEIGHT, CELL_WIDTH - (CELL_BORDER_SIZE * 2), CELL_HEIGHT - (CELL_BORDER_SIZE * 2)), 0)        
@@ -343,9 +412,9 @@ def set_other_default_game():
     right_number_strip[7] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 7), CELL_WIDTH, CELL_HEIGHT, 0)
     
     grid[0, 2] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
-    grid[1, 1] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_RIGHT)
+    #grid[1, 1] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_RIGHT)
     grid[2, 1] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
-    grid[2, 2] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_RIGHT)
+    #grid[2, 2] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_RIGHT)
     grid[3, 2] = Cell(CELL_WIDTH * 3, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
     grid[4, 2] = Cell(CELL_WIDTH * 4, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
     grid[4, 3] = Cell(CELL_WIDTH * 4, (CELL_HEIGHT * (3 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_VERTICAL)
@@ -364,14 +433,39 @@ def set_very_basic_game():
     global right_number_strip    
     global grid
     top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 1)
-    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 3)
-    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 1)
-    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 2)
-    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 3)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 2)
     right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 2)
     
     grid[0, 0] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    #grid[1, 0] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    #grid[2, 0] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_BOTTOM_LEFT)
+    #grid[2, 1] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_TOP_LEFT)
+    #grid[1, 1] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (1 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    #grid[1, 2] = Cell(CELL_WIDTH * 1, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
     grid[2, 2] = Cell(CELL_WIDTH * 2, (CELL_HEIGHT * (2 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):            
+            if(grid[col, row] == None):
+                grid[col, row] = Cell(CELL_WIDTH * col, (CELL_HEIGHT * (row + 1)), CELL_WIDTH, CELL_HEIGHT)
+
+def set_very_basic_game_again():
+    global top_number_strip
+    global right_number_strip    
+    global grid
+    top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 4)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[3] = NumberCell(CELL_WIDTH * 3, 0, CELL_WIDTH, CELL_HEIGHT, 3)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 4)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 3)
+    right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[3] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 3), CELL_WIDTH, CELL_HEIGHT, 3)
+    
+    grid[0, 0] = Cell(CELL_WIDTH * 0, (CELL_HEIGHT * (0 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
+    grid[3, 3] = Cell(CELL_WIDTH * 3, (CELL_HEIGHT * (3 + 1)), CELL_WIDTH, CELL_HEIGHT, CELL_HORIZONTAL)
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):            
             if(grid[col, row] == None):
@@ -384,10 +478,11 @@ def set_very_basic_game():
 def main():
     pygame.init()
     
-    #initialise()
+    initialise()
     #set_default_game()
     #set_other_default_game()
-    set_very_basic_game()
+    #set_very_basic_game()
+    set_very_basic_game_again()
 
     draw_ui()
 

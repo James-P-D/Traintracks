@@ -3,15 +3,15 @@
 # to get the Cell State constants
 ###############################################
 
-from julia import Main
-Main.include('library.jl')
+#from julia import Main
+#Main.include('library.jl')
 
 ###############################################
 # Main UI component sizes
 ###############################################
 
-CELL_COLS = 3
-CELL_ROWS = 3
+CELL_COLS = 4
+CELL_ROWS = 4
 
 CELL_WIDTH = 150
 CELL_HEIGHT = CELL_WIDTH
@@ -84,21 +84,32 @@ NUMBER_CELL_BORDER_SIZE = 2
 
 NUMBER_CELL_BORDER_COLOR = LIGHT_GRAY
 NUMBER_CELL_COLOR = BLACK
-NUMBER_CELL_LABEL_COLOR = WHITE
+NUMBER_CELL_NORMAL_LABEL_COLOR = WHITE
+NUMBER_CELL_CORRECT_LABEL_COLOR = GREEN
+NUMBER_CELL_INCORRECT_LABEL_COLOR = RED
 NUMBER_CELL_FONT_SIZE = FONT_SIZE
 
 ###############################################
 # Cell States - All read from Julia file
 ###############################################
 
-CELL_EMPTY = Main.CELL_EMPTY
-CELL_HORIZONTAL = Main.CELL_HORIZONTAL
-CELL_VERTICAL = Main.CELL_VERTICAL
-CELL_TOP_LEFT = Main.CELL_TOP_LEFT
-CELL_TOP_RIGHT = Main.CELL_TOP_RIGHT
-CELL_BOTTOM_RIGHT = Main.CELL_BOTTOM_RIGHT
-CELL_BOTTOM_LEFT = Main.CELL_BOTTOM_LEFT
-TOTAL_CELL_STATES = Main.TOTAL_CELL_STATES
+#CELL_EMPTY = Main.CELL_EMPTY
+#CELL_HORIZONTAL = Main.CELL_HORIZONTAL
+#CELL_VERTICAL = Main.CELL_VERTICAL
+#CELL_TOP_LEFT = Main.CELL_TOP_LEFT
+#CELL_TOP_RIGHT = Main.CELL_TOP_RIGHT
+#CELL_BOTTOM_RIGHT = Main.CELL_BOTTOM_RIGHT
+#CELL_BOTTOM_LEFT = Main.CELL_BOTTOM_LEFT
+#TOTAL_CELL_STATES = Main.TOTAL_CELL_STATES
+
+CELL_EMPTY = 0
+CELL_HORIZONTAL = 1
+CELL_VERTICAL = 2
+CELL_TOP_LEFT = 3
+CELL_TOP_RIGHT = 4
+CELL_BOTTOM_RIGHT = 5
+CELL_BOTTOM_LEFT = 6
+TOTAL_CELL_STATES = 7
 
 ###############################################
 # Cell Colors and Sizes

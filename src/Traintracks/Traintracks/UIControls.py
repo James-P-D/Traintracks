@@ -1,5 +1,6 @@
 import pygame
 from Constants import *
+import datetime
 
 ###############################################
 # NumberCell()
@@ -12,14 +13,14 @@ class NumberCell():
     __height = 0
     __value = 0
     __enabled = True
+    __correct = False
 
-    def __init__(self, x, y, width, height, value = 0, enabled = True):
+    def __init__(self, x, y, width, height, value = 0):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
         self.__value = value
-        self.__enabled = enabled
 
     def draw(self, screen):        
         pygame.draw.rect(screen, NUMBER_CELL_BORDER_COLOR, (self.__x, self.__y, self.__width, self.__height), 0)        
@@ -27,10 +28,18 @@ class NumberCell():
 
         if (self.__value != -1):
             label_font = pygame.font.SysFont('courier', NUMBER_CELL_FONT_SIZE, bold = True)
-            label_text = label_font.render(str(self.__value), 1, NUMBER_CELL_LABEL_COLOR)
+            label_text = label_font.render(str(self.__value), 1, self.__get_font_color())
             label_x = ((self.__width / 2) - (label_text.get_width() / 2) + self.__x)
             label_y = ((self.__height / 2) - (label_text.get_height() / 2) + self.__y)
             screen.blit(label_text, (int(label_x), int(label_y)))
+
+    def __get_font_color(self):
+        if self.__enabled:
+           return NUMBER_CELL_NORMAL_LABEL_COLOR
+        elif self.__correct:
+            return NUMBER_CELL_CORRECT_LABEL_COLOR
+        else:
+            return NUMBER_CELL_INCORRECT_LABEL_COLOR
 
     def is_over(self, mouse_x, mouse_y):
         return ((mouse_x >= self.__x) and (mouse_x < (self.__x + self.__width)) and (mouse_y >= self.__y) and (mouse_y < (self.__y + self.__height)))
@@ -50,6 +59,13 @@ class NumberCell():
     def disable(self):
         self.__enabled = False
 
+    def set_correct(self):
+        self.__correct = True
+
+    def set_incorrect(self):
+        self.__correct = False
+
+
 ###############################################
 # Cell()
 ###############################################
@@ -62,13 +78,12 @@ class Cell():
     __state = CELL_EMPTY
     __enabled = True
 
-    def __init__(self, x, y, width, height, state = CELL_EMPTY, enabled = True):
+    def __init__(self, x, y, width, height, state = CELL_EMPTY):
         self.__x = int(x)
         self.__y = int(y)
         self.__width = int(width)
         self.__height = int(height)
         self.__state = state
-        self.__enabled = enabled
 
     def draw(self, screen, is_correct):     
         
@@ -179,7 +194,7 @@ class Label():
         self.set_label("")
         
     def set_label(self, label):
-        self.__label = label
+        self.__label = label + " " + datetime.datetime.now().strftime("%I:%M:%S")
 
 ###############################################
 # Button()
