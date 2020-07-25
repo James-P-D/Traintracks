@@ -245,6 +245,19 @@ def solve_button_pressed():
     ################################################
 
     def solve():
+
+        def sub_solve(start_terminal, current_position, end_terminal):
+            (current_col, current_row) = current_position
+            check_top_number_strip(current_col)
+            check_right_number_strip(current_row)
+            if (current_col == end_col) and (current_row == end_row):
+                if (is_complete(start_terminal, end_terminal)):
+                    return True
+                else:
+                    return False
+
+
+
         terminals = get_terminals()
         if len(get_terminals()) != 2:
             # This shouldn't ever happen, since [Solve] button shouldn't be enabled, but just incase..
@@ -258,6 +271,14 @@ def solve_button_pressed():
         if (is_complete(terminals[0], terminals[1])):
             message_label.set_label("Complete!")
             message_label.draw(screen)
+        else:
+            sub_solve(terminals[0], terminals[0], terminals[1] )
+            if (is_complete(terminals[0], terminals[1])):
+                message_label.set_label("Complete!")
+                message_label.draw(screen)
+            else:
+                message_label.set_label("No solution found!")
+                message_label.draw(screen)
 
         processing = False
 
