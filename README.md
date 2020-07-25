@@ -1,5 +1,5 @@
 # Traintracks
-Traintrack puzzle game with UI in Python and solver in Julia
+Traintrack puzzle game UI in Python
 
 ![Screenshot](https://github.com/James-P-D/Traintracks/blob/master/screenshot.gif)
 
@@ -20,24 +20,8 @@ For Python we need the following:
 
 [pygame](https://www.pygame.org/news) (Tested with v1.9.6)  
 [numpy](https://numpy.org/) (Tested with v1.18.3)  
-[pyjulia](https://github.com/JuliaPy/pyjulia) (Tested with v0.5.3)  
 
 ```
 pip install pygame
 pip install numpy
-pip install julia
-```
-
-For Julia we need to install [pycall](https://github.com/JuliaPy/PyCall.jl):
-
-```
-julia> using Pkg
-julia> Pkg.add("PyCall")
-```
-
-I also had to run the following from the Python REPL:
-
-```
->>> import julia
->>> julia.install()
 ```
