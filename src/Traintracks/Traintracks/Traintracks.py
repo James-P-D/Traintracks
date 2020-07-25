@@ -1,10 +1,10 @@
 #TODO:
-# * is_complete() doesn't work properly! need to actually trace line, not just count!
 
 import pygame # Tested with pygame v1.9.6
 import numpy as np
 from Constants import *
 from UIControls import *
+import threading
     
 ###############################################
 # Globals
@@ -24,6 +24,7 @@ solve_button = Button((BUTTON_WIDTH * 3), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON
 quit_button = Button((BUTTON_WIDTH * 4), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, QUIT_BUTTON_LABEL, True)
 
 edit_mode = True
+processing = False
 
 ###############################################
 # game_loop()
@@ -34,9 +35,9 @@ def game_loop():
     clock = pygame.time.Clock()
     while not game_exit:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if (event.type == pygame.QUIT) and (not processing):
                 game_exit = True;
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif (event.type == pygame.MOUSEBUTTONDOWN) and (not processing):
                 (mouse_x, mouse_y) = pygame.mouse.get_pos()
                 if (clear_button.is_over(mouse_x, mouse_y)):
                     if (clear_button.is_enabled()):
@@ -80,18 +81,7 @@ def game_loop():
                                 else:                    
                                     check_top_number_strip(cell_col)
                                     check_right_number_strip(cell_row)
-
-                                    #top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
-                                    #right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
-                                    #grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
-                                    #terminals = get_terminals()
-                                    #if len(get_terminals()) == 2:
-                                    #    if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1], grid_numbers)):
-                                    #        message_label.set_label("Complete!")
-                                    #        message_label.draw(screen)
-                                    #    else:
-                                    #        message_label.set_label("Incomplete")
-                                    #        message_label.draw(screen)
+                                    # TODO: Check if board is complete if user playing?
 
         pygame.display.update()
         clock.tick(CLOCK_TICK)
@@ -154,32 +144,51 @@ def play_button_pressed():
 # solve_button_pressed()
 ###############################################
 def solve_button_pressed():
+
+    ###############################################
+    ## solve()
+    ################################################
+
+    def solve():
+        global processing
+        processing = False
+
+    ################################################
+
     terminals = get_terminals()
     if len(get_terminals()) != 2:
-        return False
-        #TODO: Set label?
-
-    top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
-    right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
-    grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
-    terminals = get_terminals()
-                                    
-    if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])):
-        message_label.set_label("Complete!")
+        # This shouldn't ever happen, since [Solve] button shouldn't be enabled, but just incase..
+        message_label.set_label("You must specify 2 terminal points")
         message_label.draw(screen)
-    else:
-        (success, new_grid) = Main_solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])
-        if (success):
-            message_label.set_label("Complete!")
-            message_label.draw(screen)
-            for col in range(CELL_COLS):
-                for row in range(CELL_ROWS):
-                    new_state = new_grid[col][row]
-                    grid[col, row].set_state(new_state)
-                    grid[col, row].draw(screen, True)
-        else:
-            message_label.set_label("No solution found!")
-            message_label.draw(screen)
+        return False
+        
+    global processing
+    processing = True
+
+    thread = threading.Thread(target = solve, args = ())
+    thread.start()                    
+
+    #top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
+    #right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
+    #grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
+    #terminals = get_terminals()
+    #                                
+    #if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])):
+    #    message_label.set_label("Complete!")
+    #    message_label.draw(screen)
+    #else:
+    #    (success, new_grid) = Main_solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])
+    #    if (success):
+    #        message_label.set_label("Complete!")
+    #        message_label.draw(screen)
+    #        for col in range(CELL_COLS):
+    #            for row in range(CELL_ROWS):
+    #                new_state = new_grid[col][row]
+    #                grid[col, row].set_state(new_state)
+    #                grid[col, row].draw(screen, True)
+    #    else:
+    #        message_label.set_label("No solution found!")
+    #        message_label.draw(screen)
 
 ###############################################
 # get_terminals()
