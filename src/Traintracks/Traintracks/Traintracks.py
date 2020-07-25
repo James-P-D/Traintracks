@@ -135,6 +135,9 @@ def edit_button_pressed():
 # play_button_pressed()
 ###############################################
 def play_button_pressed():
+    global edit_mode
+    edit_mode = False
+
     edit_button.enable()
     edit_button.draw(screen)
 
@@ -150,8 +153,6 @@ def play_button_pressed():
                 grid[col, row].disable();
                 grid[col, row].draw(screen, False)
 
-    global edit_mode
-    edit_mode = False
 
 def get_next_cell(cell_cols, cell_rows, col, row, visited_grid):
     def get_next_cell_list(cell_cols, cell_rows, col1, row1, col2, row2, visited_grid):
