@@ -1,6 +1,5 @@
 import pygame
 from Constants import *
-import datetime
 
 ###############################################
 # NumberCell()
@@ -194,7 +193,7 @@ class Label():
         self.set_label("")
         
     def set_label(self, label):
-        self.__label = label + " " + datetime.datetime.now().strftime("%I:%M:%S")
+        self.__label = label
 
 ###############################################
 # Button()
