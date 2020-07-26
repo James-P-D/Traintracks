@@ -5,7 +5,8 @@ import numpy as np
 from Constants import *
 from UIControls import *
 import threading
-    
+import time
+
 ###############################################
 # Globals
 ###############################################
@@ -154,8 +155,8 @@ def play_button_pressed():
                 grid[col, row].draw(screen, False)
 
 
-def get_next_cell(cell_cols, cell_rows, col, row, visited_grid):
-    def get_next_cell_list(cell_cols, cell_rows, col1, row1, col2, row2, visited_grid):
+def get_next_cell(col, row, visited_grid):
+    def get_next_cell_list(col1, row1, col2, row2, visited_grid):
         next_cells = []
             
         if ((col1 >= 0) and (col1 < CELL_COLS) and (row1 >= 0) and (row1 < CELL_ROWS) and not visited_grid[col1][row1]):
@@ -170,17 +171,17 @@ def get_next_cell(cell_cols, cell_rows, col, row, visited_grid):
     if (state == CELL_EMPTY):
         pass
     elif (state == CELL_HORIZONTAL):
-        return get_next_cell_list(cell_cols, cell_rows, col + 1, row, col - 1, row, visited_grid)
+        return get_next_cell_list(col + 1, row, col - 1, row, visited_grid)
     elif (state == CELL_VERTICAL):
-        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col, row + 1, visited_grid)
+        return get_next_cell_list(col, row - 1, col, row + 1, visited_grid)
     elif (state == CELL_TOP_LEFT):
-        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col - 1, row, visited_grid)
+        return get_next_cell_list(col, row - 1, col - 1, row, visited_grid)
     elif (state == CELL_TOP_RIGHT):
-        return get_next_cell_list(cell_cols, cell_rows, col, row - 1, col + 1, row, visited_grid)
+        return get_next_cell_list(col, row - 1, col + 1, row, visited_grid)
     elif (state == CELL_BOTTOM_RIGHT):
-        return get_next_cell_list(cell_cols, cell_rows, col, row + 1, col + 1, row, visited_grid)
+        return get_next_cell_list(col, row + 1, col + 1, row, visited_grid)
     elif (state == CELL_BOTTOM_LEFT):
-        return get_next_cell_list(cell_cols, cell_rows, col, row + 1, col - 1, row, visited_grid)
+        return get_next_cell_list(col, row + 1, col - 1, row, visited_grid)
     return []
 
 def get_possible_states(current_col, current_row, next_col, next_row):
@@ -246,8 +247,12 @@ def solve_button_pressed():
 
     def solve():
 
-        def sub_solve(start_terminal, current_position, end_terminal):
+        def sub_solve(start_terminal, current_position, end_terminal, visited_grid):
+            time.sleep(0.2)
             (current_col, current_row) = current_position
+            (end_col, end_row) = end_terminal
+            visited_grid[current_col, current_row] = True
+
             check_top_number_strip(current_col)
             check_right_number_strip(current_row)
             if (current_col == end_col) and (current_row == end_row):
@@ -256,6 +261,31 @@ def solve_button_pressed():
                 else:
                     return False
 
+
+            next_cells = get_next_cell(current_col, current_row, visited_grid)
+            if (len(next_cells) != 1):
+                #TODO: Set visited_grid here?          No point! Call by value..      
+                return False;
+            
+            (next_col, next_row) = next_cells[0]
+            possible_next_cells = get_possible_states(current_col, current_row, next_col, next_row)
+            if (grid[next_col][next_row].get_state() != CELL_EMPTY):
+                if(not (grid[next_col][next_row] in possible_next_cells)):
+                    return False
+                else:                    
+                    return sub_solve(start_terminal, (next_col, next_row), end_terminal, visited_grid)
+            else:
+                for possible_next_cell in possible_next_cells:
+                    grid[next_col, next_row].set_state(possible_next_cell)
+                    grid[next_col, next_row].draw(screen, False)
+
+                    if (sub_solve(start_terminal, (next_col, next_row), end_terminal, visited_grid)):
+                        return True
+                    else:
+                        grid[next_col, next_row].set_state(CELL_EMPTY)
+                        grid[next_col, next_row].draw(screen, False)
+                
+            
 
 
         terminals = get_terminals()
@@ -272,7 +302,8 @@ def solve_button_pressed():
             message_label.set_label("Complete!")
             message_label.draw(screen)
         else:
-            sub_solve(terminals[0], terminals[0], terminals[1] )
+            visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype=bool)
+            sub_solve(terminals[0], terminals[0], terminals[1], visited_grid)
             if (is_complete(terminals[0], terminals[1])):
                 message_label.set_label("Complete!")
                 message_label.draw(screen)
@@ -281,8 +312,7 @@ def solve_button_pressed():
                 message_label.draw(screen)
 
         processing = False
-
-    
+            
     thread = threading.Thread(target = solve, args = ())
     thread.start()                    
 
