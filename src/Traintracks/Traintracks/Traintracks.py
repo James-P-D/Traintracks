@@ -247,11 +247,18 @@ def solve_button_pressed():
 
     def solve():
 
-        def sub_solve(start_terminal, current_position, end_terminal, visited_grid):
-            #time.sleep(0.01)
+        def sub_solve(start_terminal, current_position, end_terminal, visited_grid):            
             (current_col, current_row) = current_position
             (end_col, end_row) = end_terminal
             visited_grid[current_col, current_row] = True
+
+            if (col_diff(current_col) < 0):
+                visited_grid[current_col, current_row] = False
+                return False
+            if (row_diff(current_row) < 0):
+                visited_grid[current_col, current_row] = False
+                return False
+
 
             check_top_number_strip(current_col)
             check_right_number_strip(current_row)
