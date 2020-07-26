@@ -219,7 +219,7 @@ def is_complete(start_terminal, end_terminal):
     while ((current_col != end_col) or (current_row != end_row)):
         visited_grid[current_col][current_row] = True
         
-        next_cells = get_next_cell(CELL_COLS, CELL_ROWS, current_col, current_row, visited_grid)
+        next_cells = get_next_cell(current_col, current_row, visited_grid)
 
         if (len(next_cells) != 1):
             return False
@@ -248,7 +248,7 @@ def solve_button_pressed():
     def solve():
 
         def sub_solve(start_terminal, current_position, end_terminal, visited_grid):
-            time.sleep(0.2)
+            time.sleep(0.01)
             (current_col, current_row) = current_position
             (end_col, end_row) = end_terminal
             visited_grid[current_col, current_row] = True
@@ -270,7 +270,8 @@ def solve_button_pressed():
             (next_col, next_row) = next_cells[0]
             possible_next_cells = get_possible_states(current_col, current_row, next_col, next_row)
             if (grid[next_col][next_row].get_state() != CELL_EMPTY):
-                if(not (grid[next_col][next_row] in possible_next_cells)):
+                next_state = grid[next_col][next_row]
+                if(not (grid[next_col][next_row].get_state() in possible_next_cells)):
                     return False
                 else:                    
                     return sub_solve(start_terminal, (next_col, next_row), end_terminal, visited_grid)
@@ -633,10 +634,10 @@ def main():
     pygame.init()
     
     initialise()
-    #set_default_game()
+    set_default_game()
     #set_other_default_game()
     #set_very_basic_game()
-    set_very_basic_game_again()
+    #set_very_basic_game_again()
 
     draw_ui()
 
