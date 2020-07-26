@@ -248,7 +248,7 @@ def solve_button_pressed():
     def solve():
 
         def sub_solve(start_terminal, current_position, end_terminal, visited_grid):
-            time.sleep(0.01)
+            #time.sleep(0.01)
             (current_col, current_row) = current_position
             (end_col, end_row) = end_terminal
             visited_grid[current_col, current_row] = True
@@ -259,12 +259,13 @@ def solve_button_pressed():
                 if (is_complete(start_terminal, end_terminal)):
                     return True
                 else:
+                    visited_grid[current_col, current_row] = False
                     return False
 
 
             next_cells = get_next_cell(current_col, current_row, visited_grid)
             if (len(next_cells) != 1):
-                #TODO: Set visited_grid here?          No point! Call by value..      
+                visited_grid[current_col, current_row] = False
                 return False;
             
             (next_col, next_row) = next_cells[0]
@@ -272,9 +273,14 @@ def solve_button_pressed():
             if (grid[next_col][next_row].get_state() != CELL_EMPTY):
                 next_state = grid[next_col][next_row]
                 if(not (grid[next_col][next_row].get_state() in possible_next_cells)):
+                    visited_grid[current_col, current_row] = False
                     return False
                 else:                    
-                    return sub_solve(start_terminal, (next_col, next_row), end_terminal, visited_grid)
+                    if (sub_solve(start_terminal, (next_col, next_row), end_terminal, visited_grid)):
+                        return True
+                    else:
+                        visited_grid[current_col, current_row] = False
+                        return False
             else:
                 for possible_next_cell in possible_next_cells:
                     grid[next_col, next_row].set_state(possible_next_cell)
@@ -285,7 +291,8 @@ def solve_button_pressed():
                     else:
                         grid[next_col, next_row].set_state(CELL_EMPTY)
                         grid[next_col, next_row].draw(screen, False)
-                
+            visited_grid[current_col, current_row] = False
+            return False
             
 
 
@@ -303,7 +310,7 @@ def solve_button_pressed():
             message_label.set_label("Complete!")
             message_label.draw(screen)
         else:
-            visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype=bool)
+            visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype = bool)
             sub_solve(terminals[0], terminals[0], terminals[1], visited_grid)
             if (is_complete(terminals[0], terminals[1])):
                 message_label.set_label("Complete!")
@@ -316,28 +323,6 @@ def solve_button_pressed():
             
     thread = threading.Thread(target = solve, args = ())
     thread.start()                    
-
-    #top_numbers = list(map(lambda n: n.get_value(), top_number_strip))
-    #right_numbers = list(map(lambda n: n.get_value(), right_number_strip))
-    #grid_numbers = list(map(lambda x: list(map(lambda y: y.get_state(), x)), grid))
-    #terminals = get_terminals()
-    #                                
-    #if (Main_is_complete(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])):
-    #    message_label.set_label("Complete!")
-    #    message_label.draw(screen)
-    #else:
-    #    (success, new_grid) = Main_solve(CELL_COLS, CELL_ROWS, top_numbers, right_numbers, terminals[0], terminals[1])
-    #    if (success):
-    #        message_label.set_label("Complete!")
-    #        message_label.draw(screen)
-    #        for col in range(CELL_COLS):
-    #            for row in range(CELL_ROWS):
-    #                new_state = new_grid[col][row]
-    #                grid[col, row].set_state(new_state)
-    #                grid[col, row].draw(screen, True)
-    #    else:
-    #        message_label.set_label("No solution found!")
-    #        message_label.draw(screen)
 
 ###############################################
 # get_terminals()
@@ -612,10 +597,10 @@ def set_very_basic_game_again():
     global grid
     top_number_strip[0] = NumberCell(CELL_WIDTH * 0, 0, CELL_WIDTH, CELL_HEIGHT, 1)
     top_number_strip[1] = NumberCell(CELL_WIDTH * 1, 0, CELL_WIDTH, CELL_HEIGHT, 4)
-    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 3)
-    top_number_strip[3] = NumberCell(CELL_WIDTH * 3, 0, CELL_WIDTH, CELL_HEIGHT, 3)
-    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 4)
-    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 3)
+    top_number_strip[2] = NumberCell(CELL_WIDTH * 2, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    top_number_strip[3] = NumberCell(CELL_WIDTH * 3, 0, CELL_WIDTH, CELL_HEIGHT, 1)
+    right_number_strip[0] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 0), CELL_WIDTH, CELL_HEIGHT, 2)
+    right_number_strip[1] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 1), CELL_WIDTH, CELL_HEIGHT, 1)
     right_number_strip[2] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 2), CELL_WIDTH, CELL_HEIGHT, 1)
     right_number_strip[3] = NumberCell(CELL_WIDTH * CELL_COLS, CELL_HEIGHT + (CELL_HEIGHT * 3), CELL_WIDTH, CELL_HEIGHT, 3)
     
