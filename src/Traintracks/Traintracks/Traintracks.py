@@ -554,7 +554,9 @@ def main():
     pygame.init()
     
     initialise()
-    set_default_game()
+    
+    # Put this line back in to run the demo game from the README.MD
+    #set_default_game()
 
     draw_ui()
 
