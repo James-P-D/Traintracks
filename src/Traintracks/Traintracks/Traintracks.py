@@ -586,7 +586,7 @@ def main():
     initialise()
     
     # Put this line back in to run the demo game from the README.MD
-    set_default_game()
+    #set_default_game()
 
     draw_ui()
 
