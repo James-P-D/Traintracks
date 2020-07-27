@@ -517,6 +517,7 @@ def draw_ui():
 ###############################################
 
 def initialise():
+    pygame.display.set_caption("Traintracks Solver")
     global top_number_strip
     global right_number_strip    
     global grid
