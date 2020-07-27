@@ -87,6 +87,7 @@ def game_loop():
                                     elif (is_complete(terminals[0], terminals[1])):
                                         message_label.set_label("Complete!")
                                         message_label.draw(screen)
+                                        draw_complete_path()
                                     else:
                                         message_label.set_label("Incomplete")
                                         message_label.draw(screen)
@@ -94,6 +95,12 @@ def game_loop():
         pygame.display.update()
         clock.tick(CLOCK_TICK)
     pygame.quit()
+
+def draw_complete_path():
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            if (grid[col, row].get_state() != CELL_EMPTY):
+                grid[col, row].draw(screen, True)
 
 ###############################################
 # clear_button_pressed()
@@ -327,12 +334,14 @@ def solve_button_pressed():
         if (is_complete(terminals[0], terminals[1])):
             message_label.set_label("Complete!")
             message_label.draw(screen)
+            draw_complete_path()
         else:
             visited_grid = np.zeros((CELL_COLS, CELL_ROWS), dtype = bool)
             sub_solve(terminals[0], terminals[0], terminals[1], visited_grid)
             if (is_complete(terminals[0], terminals[1])):
                 message_label.set_label("Complete!")
                 message_label.draw(screen)
+                draw_complete_path()
             else:
                 message_label.set_label("No solution found!")
                 message_label.draw(screen)
