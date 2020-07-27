@@ -259,6 +259,8 @@ def solve_button_pressed():
 
         def sub_solve(start_terminal, current_position, end_terminal, visited_grid):            
             (current_col, current_row) = current_position
+            check_top_number_strip(current_col)
+            check_right_number_strip(current_row)
             (end_col, end_row) = end_terminal
             visited_grid[current_col, current_row] = True
 
@@ -333,6 +335,21 @@ def solve_button_pressed():
                 message_label.draw(screen)
 
         processing = False
+
+    global edit_mode
+    edit_mode = False
+
+    for col in range(CELL_COLS):
+        top_number_strip[col].disable()
+        check_top_number_strip(col)
+    for row in range(CELL_ROWS):
+        right_number_strip[row].disable()    
+        check_right_number_strip(row)
+    for col in range(CELL_COLS):
+        for row in range(CELL_ROWS):
+            if (grid[col, row].get_state() != CELL_EMPTY):
+                grid[col, row].disable();
+                grid[col, row].draw(screen, False)
             
     thread = threading.Thread(target = solve, args = ())
     thread.start()                    
@@ -556,7 +573,7 @@ def main():
     initialise()
     
     # Put this line back in to run the demo game from the README.MD
-    #set_default_game()
+    set_default_game()
 
     draw_ui()
 
