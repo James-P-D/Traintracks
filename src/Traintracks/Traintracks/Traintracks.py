@@ -308,6 +308,9 @@ def solve_button_pressed():
                     else:
                         grid[next_col, next_row].set_state(CELL_EMPTY)
                         grid[next_col, next_row].draw(screen, False)
+                        check_top_number_strip(next_col)
+                        check_right_number_strip(next_row)
+            
             visited_grid[current_col, current_row] = False
             return False
             
