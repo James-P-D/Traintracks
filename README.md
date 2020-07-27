@@ -1,5 +1,5 @@
 # Traintracks
-Traintrack puzzle game UI in Python
+Traintrack puzzle game in Python
 
 ![Screenshot](https://github.com/James-P-D/Traintracks/blob/master/screenshot.gif)
 
