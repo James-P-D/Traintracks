@@ -1,12 +1,4 @@
 ###############################################
-# Imports - Include Julia since we will need
-# to get the Cell State constants
-###############################################
-
-#from julia import Main
-#Main.include('library.jl')
-
-###############################################
 # Main UI component sizes
 ###############################################
 
@@ -90,17 +82,8 @@ NUMBER_CELL_INCORRECT_LABEL_COLOR = RED
 NUMBER_CELL_FONT_SIZE = FONT_SIZE
 
 ###############################################
-# Cell States - All read from Julia file
+# Cell States
 ###############################################
-
-#CELL_EMPTY = Main.CELL_EMPTY
-#CELL_HORIZONTAL = Main.CELL_HORIZONTAL
-#CELL_VERTICAL = Main.CELL_VERTICAL
-#CELL_TOP_LEFT = Main.CELL_TOP_LEFT
-#CELL_TOP_RIGHT = Main.CELL_TOP_RIGHT
-#CELL_BOTTOM_RIGHT = Main.CELL_BOTTOM_RIGHT
-#CELL_BOTTOM_LEFT = Main.CELL_BOTTOM_LEFT
-#TOTAL_CELL_STATES = Main.TOTAL_CELL_STATES
 
 CELL_EMPTY = 0
 CELL_HORIZONTAL = 1
@@ -128,5 +111,3 @@ CELL_TRACK_SIZE = 4
 ###############################################
 
 CLOCK_TICK = 30
-#SMALL_SLEEP = 0.01
-#BIG_SLEEP = 0.5

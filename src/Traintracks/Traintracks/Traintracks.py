@@ -8,19 +8,27 @@ import threading
 # Globals
 ###############################################
 
+# Number cells along top and right side of grid
 top_number_strip = np.ndarray(CELL_COLS, NumberCell)
 right_number_strip = np.ndarray(CELL_ROWS, NumberCell)
+
+# Actual grid of traintrack pieces
 grid = np.ndarray((CELL_COLS, CELL_ROWS), Cell)
+
+# pygame screen
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+# Message label component
 message_label = Label(0, MESSAGE_STRIP_TOP, MESSAGE_RIBBON_WIDTH, MESSAGE_RIBBON_HEIGHT)
 
+# Button components
 clear_button = Button((BUTTON_WIDTH * 0), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, CLEAR_BUTTON_LABEL, True)
 edit_button = Button((BUTTON_WIDTH * 1), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, EDIT_BUTTON_LABEL, False)
 play_button = Button((BUTTON_WIDTH * 2), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, PLAY_BUTTON_LABEL, False)
 solve_button = Button((BUTTON_WIDTH * 3), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, SOLVE_BUTTON_LABEL, False)
 quit_button = Button((BUTTON_WIDTH * 4), BUTTON_STRIP_TOP, BUTTON_WIDTH, BUTTON_HEIGHT, QUIT_BUTTON_LABEL, True)
 
+# Global flags
 edit_mode = True
 processing = False
 
@@ -56,27 +64,33 @@ def game_loop():
                     cell_col = int(mouse_x / CELL_WIDTH)
                     cell_row = int(mouse_y / CELL_HEIGHT)
                     
+                    # Check if user is clicking along top-number strip
                     if ((cell_row == 0) and (cell_col != CELL_COLS)):
                         if (top_number_strip[cell_col].is_enabled()):
-                            top_number_strip[cell_col].inc_value(CELL_ROWS + 1)
+                            top_number_strip[cell_col].inc_value(CELL_ROWS + 1) # Increment number and wrap if necessary
                             top_number_strip[cell_col].draw(screen)
+                    # Check if user is clicking along right-number strip
                     elif ((cell_col == CELL_COLS) and (0 < cell_row <= CELL_ROWS)):
+                        # Decrement cell_row since UI is off by 1
                         cell_row -= 1
                         if (right_number_strip[cell_row].is_enabled()):
-                            right_number_strip[cell_row].inc_value(CELL_COLS + 1)
+                            right_number_strip[cell_row].inc_value(CELL_COLS + 1) # Increment number and wrap if necessary
                             right_number_strip[cell_row].draw(screen)
-                    else:
+                    else:                        
                         cell_col = int(mouse_x / CELL_WIDTH)
                         cell_row = int(mouse_y / CELL_HEIGHT) - 1 # Reduce row by 1 so we don't include the top_number_strip
                         
-                        #print(f"({cell_col}, {cell_row})")
+                        # Check if we are actually clicking on a traintrack cell
                         if ((cell_col >= 0) and (cell_col < CELL_COLS) and (cell_row >= 0) and (cell_row < CELL_ROWS)):
                             if (grid[cell_col, cell_row].is_enabled()):
-                                grid[cell_col, cell_row].inc_state();
+                                grid[cell_col, cell_row].inc_state(); # Increment the current piece and wrap if necessary
                                 grid[cell_col, cell_row].draw(screen, False);
                                 if (edit_mode):
+                                    # Check to see if we have two terminals yet
                                     check_board_state()
-                                else:                    
+                                else:
+                                    # Otherwise, we are playing, so check if the top or right number
+                                    # strips need updating between green and red
                                     check_top_number_strip(cell_col)
                                     check_right_number_strip(cell_row)
 
@@ -96,6 +110,10 @@ def game_loop():
         clock.tick(CLOCK_TICK)
     pygame.quit()
 
+###############################################
+# draw_complete_path()
+###############################################
+
 def draw_complete_path():
     for col in range(CELL_COLS):
         for row in range(CELL_ROWS):
@@ -105,6 +123,7 @@ def draw_complete_path():
 ###############################################
 # clear_button_pressed()
 ###############################################
+
 def clear_button_pressed():
     if (edit_mode):
         initialise();
@@ -119,6 +138,7 @@ def clear_button_pressed():
 ###############################################
 # edit_button_pressed()
 ###############################################
+
 def edit_button_pressed():
     for col in range(CELL_COLS):
         top_number_strip[col].enable()
@@ -136,6 +156,7 @@ def edit_button_pressed():
 ###############################################
 # play_button_pressed()
 ###############################################
+
 def play_button_pressed():
     global edit_mode
     edit_mode = False
